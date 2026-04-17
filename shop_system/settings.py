@@ -165,10 +165,15 @@ CLOUDINARY_STORAGE = {
 
 
 # Static files and Media storage configuration
-if CLOUDINARY_STORAGE.get('CLOUD_NAME'):
+def is_cloudinary_configured():
+    cloud_name = CLOUDINARY_STORAGE.get('CLOUD_NAME')
+    return cloud_name and cloud_name != 'your_cloud_name'
+
+if is_cloudinary_configured():
     DEFAULT_STORAGE_BACKEND = "cloudinary_storage.storage.MediaCloudinaryStorage"
 else:
     DEFAULT_STORAGE_BACKEND = "django.core.files.storage.FileSystemStorage"
+
 
 STORAGES = {
     "default": {
