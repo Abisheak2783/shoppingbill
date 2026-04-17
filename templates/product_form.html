@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{{ action }} Product{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 0; max-width: 1000px; margin: 0 auto; overflow: hidden;">
+    <div style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 32px; color: white;">
+        <h2 style="margin: 0; font-size: 24px; font-weight: 800;">{{ action }} Product</h2>
+        <p style="margin: 8px 0 0; opacity: 0.9; font-size: 14px;">Fill in the details below to {% if action == 'Add' %}create a new product in{% else %}update the catalog for{% endif %} your inventory.</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" style="padding: 32px;">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px;">
+            <!-- Left Column: Details -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <div style="background: var(--bg-main); padding: 24px; border-radius: 16px;">
+                    <h3 style="font-size: 16px; margin-bottom: 20px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                        <i class='bx bx-info-circle' style="color: var(--primary);"></i> General Information
+                    </h3>
+                    
+                    <!-- Product Name -->
+                    <div class="form-group">
+                        <label class="form-label"><i class='bx bx-purchase-tag'></i> Product Name</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}<div class="message-error">{{ form.name.errors }}</div>{% endif %}
+                    </div>
+
+                    <!-- Category -->
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label"><i class='bx bx-category'></i> Category</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}<div class="message-error">{{ form.category.errors }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-main); padding: 24px; border-radius: 16px;">
+                    <h3 style="font-size: 16px; margin-bottom: 20px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                        <i class='bx bx-money' style="color: var(--primary);"></i> Pricing & Stock
+                    </h3>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <!-- Price -->
+                        <div class="form-group">
+                            <label class="form-label"><i class='bx bx-rupee'></i> Unit Price</label>
+                            {{ form.price }}
+                            {% if form.price.errors %}<div class="message-error">{{ form.price.errors }}</div>{% endif %}
+                        </div>
+
+                        <!-- Stock Quantity -->
+                        <div class="form-group">
+                            <label class="form-label"><i class='bx bx-package'></i> Opening Stock</label>
+                            {{ form.stock_quantity }}
+                            {% if form.stock_quantity.errors %}<div class="message-error">{{ form.stock_quantity.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Low Stock Threshold -->
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label"><i class='bx bx-bell'></i> Low Stock Alert Threshold</label>
+                        {{ form.low_stock_threshold }}
+                        <small style="color: var(--text-muted); font-size: 11px; margin-top: 6px; display: block;">Notification will trigger when stock falls below this number.</small>
+                        {% if form.low_stock_threshold.errors %}<div class="message-error">{{ form.low_stock_threshold.errors }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Media -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <div style="background: var(--bg-main); padding: 24px; border-radius: 16px; height: 100%;">
+                    <h3 style="font-size: 16px; margin-bottom: 20px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                        <i class='bx bx-image' style="color: var(--primary);"></i> Product Image
+                    </h3>
+
+                    <div class="image-preview-container" id="imagePreviewContainer">
+                        {% if form.instance.image %}
+                            <img src="{{ form.instance.image.url }}" id="imagePreview" alt="Preview">
+                        {% else %}
+                            <div id="imagePlaceholder" style="text-align: center; color: var(--text-muted);">
+                                <i class='bx bx-cloud-upload' style="font-size: 48px; margin-bottom: 12px; display: block;"></i>
+                                <span style="font-size: 13px; font-weight: 500;">No Image Selected</span>
+                            </div>
+                            <img src="" id="imagePreview" alt="Preview" style="display: none;">
+                        {% endif %}
+                    </div>
+
+                    <div class="custom-file-upload">
+                        {{ form.image }}
+                        <div style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 8px;">
+                            PNG, JPG or GIF (Max 5MB)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; display: flex; gap: 16px; border-top: 1px solid var(--glass-outline); padding-top: 32px; justify-content: flex-end;">
+            <a href="{% url 'product_list' %}" class="btn" style="min-width: 140px; justify-content: center; background: white; color: var(--text-main); border: 1px solid var(--glass-outline);">
+                Discard
+            </a>
+            <button type="submit" class="btn btn-primary" style="min-width: 180px; justify-content: center; padding: 14px;">
+                <i class='bx bx-save'></i> Save Product Details
+            </button>
+        </div>
+    </form>
+
+    <style>
+        .image-preview-container {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid var(--glass-outline);
+            box-shadow: var(--shadow-inner);
+        }
+        #imagePreview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .custom-file-upload {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px dashed var(--glass-border);
+            border-radius: 16px;
+            transition: var(--transition);
+        }
+        .custom-file-upload:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+        .custom-file-upload input[type="file"] {
+            width: 100%;
+            cursor: pointer;
+        }
+        .message-error ul { list-style: none; padding: 0; margin-top: 4px; font-size: 13px; color: var(--danger); font-weight: 600; }
+        
+        @media (max-width: 768px) {
+            form > div { grid-template-columns: 1fr !important; }
+        }
+    </style>
+
+    <script>
+        document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+            const preview = document.getElementById('imagePreview');
+            const placeholder = document.getElementById('imagePlaceholder');
+            const file = e.target.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    preview.src = event.target.result;
+                    preview.style.display = 'block';
+                    if (placeholder) placeholder.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Shop System{% endblock %}
+
+{% block login_content %}
+<div class="login-container">
+    <div class="glass-panel login-card">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.3);">
+                <i class='bx bx-shopping-bag' style="font-size: 32px; color: white;"></i>
+            </div>
+            <h2 style="text-align: center; margin-bottom: 8px; color: white;">ShopSys</h2>
+            <p class="login-subtitle">Sign in to manage your business</p>
+        </div>
+        
+        {% if form.errors %}
+            <div style="background: rgba(239, 68, 68, 0.2); border-left: 4px solid #ef4444; padding: 12px; margin-bottom: 24px; border-radius: 8px; backdrop-filter: blur(5px);">
+                <p style="color: white; font-size: 13px; font-weight: 500;">Invalid username or password. Please try again.</p>
+            </div>
+        {% endif %}
+        
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <i class='bx bx-user'></i>
+                <label for="id_username" class="form-label">Username</label>
+                <input type="text" name="username" autofocus class="form-control" placeholder="Enter username" required id="id_username">
+            </div>
+            <div class="form-group">
+                <i class='bx bx-lock-alt'></i>
+                <label for="id_password" class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter password" required id="id_password">
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+                Login to Dashboard <i class='bx bx-right-arrow-alt'></i>
+            </button>
+            <input type="hidden" name="next" value="{{ next }}">
+        </form>
+        
+        <div style="margin-top: 32px; text-align: center; color: rgba(255,255,255,0.6); font-size: 12px;">
+            &copy; 2026 ShopSys Billing v2.0
+        </div>
+    </div>
+</div>
+{% endblock %}
