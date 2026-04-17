@@ -561,79 +561,11 @@ body {
 
     .dashboard-grid {
         grid-template-columns: 1fr;
-        gap: 16px;
     }
     
     .login-container {
         margin-left: 0;
         padding: 20px;
-    }
-
-    /* Stacked Table for Mobile */
-    .premium-table-container {
-        padding: 0;
-    }
-
-    .premium-table thead {
-        display: none; /* Hide headers on mobile */
-    }
-
-    .premium-table tr {
-        display: block;
-        margin-bottom: 24px;
-        border: 1px solid var(--glass-outline);
-        border-radius: 20px;
-        background: white;
-        padding: 12px;
-        box-shadow: var(--shadow-md);
-    }
-
-    .premium-table td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 8px;
-        border: none !important;
-        text-align: right;
-        min-height: 50px;
-        border-bottom: 1px solid rgba(0,0,0,0.03) !important;
-    }
-
-    .premium-table td:last-child {
-        border-bottom: none !important;
-        border-radius: 0 0 16px 16px;
-    }
-
-    .premium-table td:first-child {
-        display: block;
-        text-align: left;
-        background: var(--bg-main);
-        margin: -12px -12px 12px -12px;
-        padding: 16px;
-        border-radius: 20px 20px 0 0;
-        border-bottom: 1px solid var(--glass-outline) !important;
-    }
-
-    .premium-table td:before {
-        content: attr(data-label);
-        float: left;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 11px;
-        color: var(--text-muted);
-        letter-spacing: 0.5px;
-    }
-
-    .premium-table td:first-child:before {
-        display: none;
-    }
-
-    .mob-hide {
-        display: none !important;
-    }
-
-    .premium-table .mob-category, .premium-table .mob-price {
-        display: flex; 
     }
 }
 

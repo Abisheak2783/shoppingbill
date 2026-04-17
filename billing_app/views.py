@@ -80,41 +80,15 @@ def dashboard(request):
 
     # Today's Item Summary (Using the helper)
     today_items_summary = get_bill_items_summary(bills_today)
-
-    # Daily Goal Logic
-    daily_goal = Decimal('10000.00') # Set a default daily goal
-    goal_progress = (total_sales_today / daily_goal * 100) if daily_goal > 0 else 0
-    goal_progress = min(100, float(goal_progress)) # Cap at 100%
-    
-    # Recent Bills (Last 5)
-    recent_bills = Bill.objects.all().order_by('-id')[:5]
-
-    # Full Product List for Dashboard Quick Search
-    all_products = Product.objects.all().order_by('name')
-    products_json = json.dumps([
-        {
-            'id': p.id,
-            'name': p.name,
-            'price': float(p.price),
-            'stock': p.stock_quantity,
-            'category': p.category.name if p.category else 'Uncategorized'
-        } for p in all_products
-    ])
-
+        
     context = {
         'total_sales_today': total_sales_today,
         'total_revenue': total_revenue,
-        'low_stock_products': low_stock_products[:5],
+        'low_stock_products': low_stock_products,
         'bills_today_count': bills_today.count(),
-        'recent_activity': recent_activity, # Items
-        'recent_bills': recent_bills, # Full Bills
+        'recent_activity': recent_activity,
         'today_items_summary': today_items_summary,
         'last_bill': last_bill,
-        'daily_goal': daily_goal,
-        'goal_progress': goal_progress,
-        'total_products_count': all_products.count(),
-        'total_categories_count': Category.objects.count(),
-        'products_json': products_json,
     }
     return render(request, 'dashboard.html', context)
 
