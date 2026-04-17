@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
+import cloudinary
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -41,12 +42,14 @@ if RENDER_EXTERNAL_HOSTNAME:
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',
     'billing_app',
 ]
 
@@ -147,3 +150,19 @@ LOGOUT_REDIRECT_URL = 'login'
 # Strict Security & Session Settings
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True      # Instantly log out when the user closes the browser/tab
 SESSION_COOKIE_AGE = 900                    # Automatically log out after 15 minutes of inactivity (900 seconds)
+
+# Cloudinary Storage Configuration
+cloudinary.config(
+    cloud_name = os.getenv("CLOUD_NAME"),
+    api_key = os.getenv("API_KEY"),
+    api_secret = os.getenv("API_SECRET")
+)
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Static files configuration (keeping WhiteNoise)
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
