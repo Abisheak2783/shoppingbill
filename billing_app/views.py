@@ -164,9 +164,12 @@ def product_add(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Product added successfully.')
-            return redirect('product_list')
+            try:
+                form.save()
+                messages.success(request, 'Product added successfully.')
+                return redirect('product_list')
+            except Exception as e:
+                messages.error(request, f'Error saving product: {str(e)}. Please check your image or storage settings.')
     else:
         form = ProductForm()
     return render(request, 'product_form.html', {'form': form, 'action': 'Add'})
@@ -177,9 +180,12 @@ def product_edit(request, pk):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Product updated successfully.')
-            return redirect('product_list')
+            try:
+                form.save()
+                messages.success(request, 'Product updated successfully.')
+                return redirect('product_list')
+            except Exception as e:
+                messages.error(request, f'Error updating product: {str(e)}. Please check your image or storage settings.')
     else:
         form = ProductForm(instance=product)
     return render(request, 'product_form.html', {'form': form, 'action': 'Edit'})

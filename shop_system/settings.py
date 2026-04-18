@@ -10,15 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
-import os
-import dj_database_url
-import cloudinary
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
     pass
+
+from pathlib import Path
+import os
+import dj_database_url
+import cloudinary
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,14 +43,14 @@ if RENDER_EXTERNAL_HOSTNAME:
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudinary_storage',
+    'cloudinary',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary_storage',
-    'cloudinary',
     'billing_app',
 ]
 
@@ -137,8 +138,9 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise settings for production
 if not DEBUG:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     WHITENOISE_MANIFEST_STRICT = False
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -163,24 +165,22 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv('API_SECRET'),
 }
 
-
-# Static files and Media storage configuration
+# Media and Static Storage Configuration
 def is_cloudinary_configured():
     cloud_name = CLOUDINARY_STORAGE.get('CLOUD_NAME')
-    return cloud_name and cloud_name != 'your_cloud_name'
+    return bool(cloud_name and cloud_name not in [None, 'your_cloud_name', ''])
 
 if is_cloudinary_configured():
-    DEFAULT_STORAGE_BACKEND = "cloudinary_storage.storage.MediaCloudinaryStorage"
+    DEFAULT_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 else:
-    DEFAULT_STORAGE_BACKEND = "django.core.files.storage.FileSystemStorage"
-
+    DEFAULT_STORAGE = "django.core.files.storage.FileSystemStorage"
 
 STORAGES = {
     "default": {
-        "BACKEND": DEFAULT_STORAGE_BACKEND,
+        "BACKEND": DEFAULT_STORAGE,
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.StaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
