@@ -1,9 +1,11 @@
 import os
 import django
+import sys
 from django.contrib.auth import get_user_model
 
-def create_superuser():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop_system.settings')
+# Add project root to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop_system.settings')
     django.setup()
     
     User = get_user_model()
