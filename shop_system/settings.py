@@ -45,6 +45,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 
 # ================= APPS =================
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
     'cloudinary_storage',
     'cloudinary',
     'django.contrib.admin',
@@ -58,8 +59,8 @@ INSTALLED_APPS = [
 
 # ================= MIDDLEWARE =================
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
