@@ -139,6 +139,9 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Added for compatibility with django-cloudinary-storage which specifically looks for this setting
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage"
+
 # WhiteNoise settings for production
 if not DEBUG:
    WHITENOISE_ALLOW_ALL_ORIGINS = True
