@@ -27,14 +27,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ================= SECURITY =================
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-change-this-in-production")
 
-# DEBUG off on Render
-DEBUG = 'RENDER' not in os.environ
+# DEBUG off on Render (Checks multiple common environment indicators)
+IS_ON_RENDER = 'RENDER' in os.environ or 'PORT' in os.environ
+DEBUG = not IS_ON_RENDER
 
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '192.168.1.194',
     '.onrender.com',
+    '*',  # Added as a temporary global fallback to ensure access
 ]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
@@ -138,9 +140,12 @@ STORAGES = {
         "BACKEND": DEFAULT_STORAGE,
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.StaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+
+# Ensure Whitenoise handles static files accurately
+WHITENOISE_USE_FINDERS = DEBUG
 
 # Compatibility setting
 STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]

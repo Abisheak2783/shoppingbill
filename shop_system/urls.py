@@ -18,5 +18,7 @@ urlpatterns = [
     path('', include('billing_app.urls')),
 ]
 
-if settings.DEBUG:
+# Safety net for static and media files
+if settings.DEBUG or os.environ.get('RENDER'):
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
