@@ -19,7 +19,8 @@ urlpatterns = [
     path('', include('billing_app.urls')),
 ]
 
-# Safety net for static and media files
-if settings.DEBUG or os.environ.get('RENDER'):
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Nuclear Safety Net: Force serving static and media files even in production
+urlpatterns += [
+    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
