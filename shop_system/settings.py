@@ -139,6 +139,8 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
 # WhiteNoise settings for production
 if not DEBUG:
     WHITENOISE_MANIFEST_STRICT = False
