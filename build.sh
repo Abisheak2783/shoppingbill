@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # exit on error
 set -o errexit
+# trace commands
+set -x
 
 # upgrade pip
 python -m pip install --upgrade pip
