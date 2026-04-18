@@ -119,7 +119,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Diagnostic
 print(f"DEBUG: BASE_DIR is {BASE_DIR}")
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 print(f"DEBUG: STATICFILES_DIRS is {STATICFILES_DIRS}")
+if os.path.exists(STATICFILES_DIRS[0]):
+    print(f"DEBUG: Static directory EXISTS locally at {STATICFILES_DIRS[0]}")
+else:
+    print(f"DEBUG: Static directory MISSING locally!")
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
