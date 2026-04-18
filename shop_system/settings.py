@@ -128,43 +128,49 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
+# Static and Media Files
 STATIC_URL = 'static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
-]
-
+STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# SIMPLE STATIC STORAGE (NO ERRORS)
-STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
-
-# ================= CLOUDINARY =================
-
-import cloudinary
-
-cloudinary.config(
-    cloud_name=os.environ.get("CLOUD_NAME"),
-    api_key=os.environ.get("API_KEY"),
-    api_secret=os.environ.get("API_SECRET")
-)
-
-# FORCE Cloudinary for media
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-# WhiteNoise settings for production
-if not DEBUG:
-   WHITENOISE_ALLOW_ALL_ORIGINS = True
-   WHITENOISE_MANIFEST_STRICT = False
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Cloudinary Storage Configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUD_NAME'),
+    'API_KEY': os.getenv('API_KEY'),
+    'API_SECRET': os.getenv('API_SECRET'),
+}
+
+# Determine default storage backend fallback
+def is_cloudinary_configured():
+    cloud_name = CLOUDINARY_STORAGE.get('CLOUD_NAME')
+    return bool(cloud_name and cloud_name not in [None, 'your_cloud_name', ''])
+
+if is_cloudinary_configured():
+    DEFAULT_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+else:
+    DEFAULT_STORAGE = "django.core.files.storage.FileSystemStorage"
+
+# Modern Django 4.2+ Storage Configuration
+STORAGES = {
+    "default": {
+        "BACKEND": DEFAULT_STORAGE,
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+# Added for legacy package compatibility during collectstatic
+STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
+
+# WhiteNoise settings for production
+if not DEBUG:
+   WHITENOISE_MANIFEST_STRICT = False
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Auth settings
 LOGIN_URL = 'login'
