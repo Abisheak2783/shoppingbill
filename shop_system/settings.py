@@ -139,8 +139,21 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Added for compatibility with django-cloudinary-storage which specifically looks for this setting
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage"
+# SIMPLE STATIC STORAGE (NO ERRORS)
+STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+
+# ================= CLOUDINARY =================
+
+import cloudinary
+
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUD_NAME"),
+    api_key=os.environ.get("API_KEY"),
+    api_secret=os.environ.get("API_SECRET")
+)
+
+# FORCE Cloudinary for media
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # WhiteNoise settings for production
 if not DEBUG:
@@ -162,30 +175,6 @@ LOGOUT_REDIRECT_URL = 'login'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True      # Instantly log out when the user closes the browser/tab
 SESSION_COOKIE_AGE = 900                    # Automatically log out after 15 minutes of inactivity (900 seconds)
 
-# Cloudinary Storage Configuration
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUD_NAME'),
-    'API_KEY': os.getenv('API_KEY'),
-    'API_SECRET': os.getenv('API_SECRET'),
-}
 
-# Media and Static Storage Configuration
-def is_cloudinary_configured():
-    cloud_name = CLOUDINARY_STORAGE.get('CLOUD_NAME')
-    return bool(cloud_name and cloud_name not in [None, 'your_cloud_name', ''])
-
-if is_cloudinary_configured():
-    DEFAULT_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-else:
-    DEFAULT_STORAGE = "django.core.files.storage.FileSystemStorage"
-
-STORAGES = {
-    "default": {
-        "BACKEND": DEFAULT_STORAGE,
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
 
 
