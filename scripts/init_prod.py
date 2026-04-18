@@ -9,9 +9,12 @@ def init_production():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop_system.settings')
     django.setup()
     
-    # 1. Run Migrations
+    # 1. Run Migrations & Collectstatic
     print("Running database migrations...")
     call_command('migrate', interactive=False)
+    
+    print("Running runtime collectstatic (Guarantee phase)...")
+    call_command('collectstatic', interactive=False, clear=True)
     
     # 2. Ensure Superuser exists and has correct password
     from django.contrib.auth import get_user_model

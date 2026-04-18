@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: shoppingbill
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn shop_system.wsgi"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DJANGO_SETTINGS_MODULE
+        value: shop_system.settings
+      - key: DEBUG
+        value: "False"

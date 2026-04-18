@@ -158,7 +158,8 @@ STORAGES = {
 }
 
 # Ensure Whitenoise handles static files accurately
-WHITENOISE_USE_FINDERS = DEBUG
+# Force Whitenoise to find files directly if collectstatic fails to move them
+WHITENOISE_USE_FINDERS = True
 
 # Compatibility setting
 STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
