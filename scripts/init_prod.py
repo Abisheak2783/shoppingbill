@@ -16,6 +16,18 @@ def init_production():
     print("Running runtime collectstatic (Guarantee phase)...")
     call_command('collectstatic', interactive=False, clear=True)
     
+    # 2. Check for Data Transfer file and Load it
+    data_file = os.path.join(os.environ.get('BASE_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data_transfer.json')
+    if os.path.exists(data_file):
+        print(f"FOUND data transfer file: {data_file}. Loading data...")
+        try:
+            call_command('loaddata', data_file)
+            print("Data loaded successfully.")
+        except Exception as e:
+            print(f"ERROR loading data: {e}")
+    else:
+        print("No data transfer file found. Skipping data import.")
+    
     # 2. Ensure Superuser exists and has correct password
     from django.contrib.auth import get_user_model
     User = get_user_model()
