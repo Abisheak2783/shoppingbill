@@ -12,8 +12,5 @@ pip install --no-cache-dir -r requirements.txt
 rm -rf staticfiles
 
 # run build commands
+# Only static files here. No database migrations!
 python manage.py collectstatic --no-input
-python manage.py migrate
-
-# Create superuser if it doesn't exist
-python scripts/create_superuser.py
