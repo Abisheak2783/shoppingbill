@@ -13,34 +13,47 @@ def init_production():
     print("Running database migrations...")
     call_command('migrate', interactive=False)
     
-    # 2. Ensure Superuser exists and has correct password
+    # 2. Ensure multiple Superusers exist and have correct passwords
     from django.contrib.auth import get_user_model
     User = get_user_model()
     
-    username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
-    email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@example.com')
-    password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin123')
+    # Admin List
+    admins = [
+        ('admin', 'admin@example.com', 'admin123'),
+        ('shopadmin', 'shop@example.com', 'admin123'),
+    ]
     
-    user, created = User.objects.get_or_create(username=username, defaults={'email': email})
+    for username, email, password in admins:
+        user, created = User.objects.get_or_create(username=username, defaults={'email': email})
+        
+        if created:
+            print(f"Created new superuser: {username}")
+        else:
+            print(f"Updating existing superuser: {username}")
+        
+        user.set_password(password)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
+        print(f"Password for {username} is GUARANTEED to be 'admin123'.")
     
-    if created:
-        print(f"Created new superuser: {username}")
-    else:
-        print(f"Updating existing superuser: {username}")
+    # 3. Diagnostic: Check and Log static files existence
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    static_root = os.path.join(project_root, 'staticfiles')
+    css_dir = os.path.join(static_root, 'css')
     
-    user.set_password(password)
-    user.is_superuser = True
-    user.is_staff = True
-    user.save()
-    print(f"Password for {username} has been set/reset successfully.")
+    print(f"Diagnostic: Project root: {project_root}")
+    print(f"Diagnostic: Static root: {static_root}")
     
-    # 3. Diagnostic: Check static files
-    static_root = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'staticfiles')
     if os.path.exists(static_root):
         file_count = sum([len(files) for r, d, files in os.walk(static_root)])
-        print(f"Diagnostic: {file_count} static files found in staticfiles directory.")
+        print(f"Diagnostic: SUCCESS - {file_count} static files found in staticfiles directory.")
+        
+        if os.path.exists(css_dir):
+            css_files = os.listdir(css_dir)
+            print(f"Diagnostic: CSS folder contents: {css_files}")
     else:
-        print("Diagnostic: staticfiles directory NOT FOUND!")
+        print("Diagnostic: ERROR - staticfiles directory NOT FOUND!")
 
 if __name__ == '__main__':
     init_production()
