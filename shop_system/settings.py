@@ -112,9 +112,14 @@ USE_I18N = True
 USE_TZ = True
 
 # ================= STATIC / MEDIA FILES =================
+import os
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Diagnostic
+print(f"DEBUG: BASE_DIR is {BASE_DIR}")
+print(f"DEBUG: STATICFILES_DIRS is {STATICFILES_DIRS}")
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
