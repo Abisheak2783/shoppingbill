@@ -141,7 +141,7 @@ STORAGES = {
         "BACKEND": DEFAULT_STORAGE,
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 

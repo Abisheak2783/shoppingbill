@@ -13,29 +13,26 @@ def init_production():
     print("Running database migrations...")
     call_command('migrate', interactive=False)
     
-    # 2. Ensure multiple Superusers exist and have correct passwords
+    # 2. Ensure Superuser exists and has correct password
     from django.contrib.auth import get_user_model
     User = get_user_model()
     
-    # Admin List
-    admins = [
-        ('admin', 'admin@example.com', 'admin123'),
-        ('shopadmin', 'shop@example.com', 'admin123'),
-    ]
+    username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
+    email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@example.com')
+    password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin123')
     
-    for username, email, password in admins:
-        user, created = User.objects.get_or_create(username=username, defaults={'email': email})
-        
-        if created:
-            print(f"Created new superuser: {username}")
-        else:
-            print(f"Updating existing superuser: {username}")
-        
-        user.set_password(password)
-        user.is_superuser = True
-        user.is_staff = True
-        user.save()
-        print(f"Password for {username} is GUARANTEED to be 'admin123'.")
+    user, created = User.objects.get_or_create(username=username, defaults={'email': email})
+    
+    if created:
+        print(f"Created new superuser: {username}")
+    else:
+        print(f"Updating existing superuser: {username}")
+    
+    user.set_password(password)
+    user.is_superuser = True
+    user.is_staff = True
+    user.save()
+    print(f"Password for {username} is GUARANTEED to be 'admin123'.")
     
     # 3. Diagnostic: Check and Log static files existence
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
