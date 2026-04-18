@@ -10,6 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 from pathlib import Path
 import os
 import dj_database_url
@@ -19,10 +25,7 @@ import cloudinary
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ================= SECURITY =================
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY",
-    "django-insecure-change-this-in-production"
-)
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-change-this-in-production")
 
 # DEBUG off on Render
 DEBUG = 'RENDER' not in os.environ
@@ -30,6 +33,7 @@ DEBUG = 'RENDER' not in os.environ
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
+    '192.168.1.194',
     '.onrender.com',
 ]
 
@@ -41,22 +45,19 @@ if RENDER_EXTERNAL_HOSTNAME:
 INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'billing_app',  # your app
+    'billing_app',
 ]
 
 # ================= MIDDLEWARE =================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -107,42 +108,53 @@ TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
-# ================= STATIC FILES =================
+# ================= STATIC / MEDIA FILES =================
 STATIC_URL = 'static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
-]
-
+STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ================= CLOUDINARY =================
-cloudinary.config(
-    cloud_name=os.environ.get("CLOUD_NAME"),
-    api_key=os.environ.get("API_KEY"),
-    api_secret=os.environ.get("API_SECRET")
-)
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
-# ================= STORAGE (DJANGO 4.2+ / 5) =================
+# ================= CLOUDINARY CONFIG =================
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUD_NAME'),
+    'API_KEY': os.getenv('API_KEY'),
+    'API_SECRET': os.getenv('API_SECRET'),
+}
+
+def is_cloudinary_configured():
+    cloud_name = CLOUDINARY_STORAGE.get('CLOUD_NAME')
+    return bool(cloud_name and cloud_name not in [None, 'your_cloud_name', ''])
+
+if is_cloudinary_configured():
+    DEFAULT_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+else:
+    DEFAULT_STORAGE = "django.core.files.storage.FileSystemStorage"
+
+# ================= STORAGE (DJANGO 5) =================
 STORAGES = {
     "default": {
-        # Media files → Cloudinary
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        "BACKEND": DEFAULT_STORAGE,
     },
     "staticfiles": {
-        # Static files → WhiteNoise (NO manifest/compression to avoid errors)
-        "BACKEND": "whitenoise.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
-STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
-# ================= DEFAULT FIELD =================
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ================= AUTH REDIRECTS =================
+# Compatibility setting
+STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
+
+# WhiteNoise settings
+if not DEBUG:
+   WHITENOISE_MANIFEST_STRICT = False
+
+# ================= OTHER =================
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
 # ================= SESSION SECURITY =================
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 900
+SESSION_COOKIE_AGE = 900
