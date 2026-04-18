@@ -1,44 +1,230 @@
 {% extends 'base.html' %}
 
-{% block page_title %}Create Bill{% endblock %}
+{% block page_title %}New Bill (Point of Sale){% endblock %}
 
 {% block extra_head %}
 <style>
-    .pos-grid {
+    .pos-layout {
         display: grid;
-        grid-template-columns: 1fr 380px;
+        grid-template-columns: 1fr 400px;
+        gap: 32px;
+        height: calc(100vh - 120px);
+    }
+    
+    @media (max-width: 1200px) {
+        .pos-layout {
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .pos-layout {
+            grid-template-columns: 1fr;
+            height: auto;
+            gap: 40px;
+        }
+    }
+    .pos-products {
+        display: flex;
+        flex-direction: column;
         gap: 20px;
+        overflow: hidden;
     }
-    .product-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 16px;
+    .category-tabs {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding: 4px 4px 12px 4px;
+        scrollbar-width: none;
     }
-    .product-box {
+    .category-tabs::-webkit-scrollbar { display: none; }
+    .category-tab {
+        padding: 10px 20px;
         background: white;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 12px;
+        border: 1px solid var(--glass-outline);
+        border-radius: 14px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: var(--transition);
+        color: var(--text-muted);
+        font-weight: 500;
+        font-size: 14px;
+        box-shadow: var(--shadow-sm);
+    }
+    .category-tab:hover {
+        background: var(--primary-glow);
+        color: var(--primary);
+    }
+    .category-tab.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+        overflow-y: auto;
+        padding: 4px 12px 20px 4px;
+        align-items: start; /* Fixes stretching! */
+        align-content: start;
+        flex-grow: 1;
+    }
+    .product-card {
+        background: white;
+        border: 1px solid var(--glass-outline);
+        border-radius: 18px;
+        padding: 16px;
         text-align: center;
         cursor: pointer;
         transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
-    .product-box:hover {
+    .product-card:hover {
+        transform: translateY(-6px);
         border-color: var(--primary);
-        box-shadow: var(--shadow-md);
+        box-shadow: var(--shadow-lg);
     }
-    .cart-box {
-        background: white;
-        border: 1px solid var(--border-color);
+    .product-card.out-of-stock {
+        opacity: 0.6;
+        cursor: not-allowed;
+        filter: grayscale(0.5);
+    }
+    .product-image {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
         border-radius: 8px;
-        padding: 20px;
-        position: sticky;
-        top: 100px;
-        height: fit-content;
+        margin-bottom: 12px;
+        background: rgba(255, 255, 255, 0.05); /* Placeholder bg */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: var(--text-muted);
     }
-    @media (max-width: 900px) {
-        .pos-grid { grid-template-columns: 1fr; }
-        .cart-box { position: static; }
+    .product-name {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: var(--text-main);
+    }
+    .product-price {
+        font-size: 14px;
+        color: var(--success);
+        font-weight: bold;
+    }
+    .product-stock {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+    .stock-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: var(--primary);
+        color: white;
+        font-size: 10px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+    }
+    
+    .pos-cart {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: white; /* Stronger contrast for cart */
+}
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.cart-items {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    padding-right: 4px;
+}
+#billTable {
+    width: 100%;
+    font-size: 14px;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+#billTable tr {
+    background: var(--bg-main);
+    border-radius: 12px;
+}
+#billTable td, #billTable th {
+    padding: 12px;
+    border: none;
+}
+#billTable td:first-child { border-radius: 12px 0 0 12px; }
+#billTable td:last-child { border-radius: 0 12px 12px 0; }
+    
+    /* Animation for clicking */
+    @keyframes pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(0.95); }
+        100% { transform: scale(1); }
+    }
+    .pop-anim {
+        animation: pop 0.2s ease;
+    }
+
+    /* Mobile Cart Summary Sticky Bar */
+    .mobile-cart-bar {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: var(--primary);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 16px;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5);
+        z-index: 98;
+        cursor: pointer;
+        animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+        from { transform: translateY(100px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width: 1024px) {
+        .mobile-cart-bar.active {
+            display: flex;
+        }
+        
+        .product-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+            max-height: none;
+            overflow: visible;
+        }
+        
+        .pos-cart {
+            margin-bottom: 80px; /* Space for the floating bar */
+        }
     }
 </style>
 {% endblock %}
@@ -46,34 +232,43 @@
 {% block content %}
 <form method="post" id="billForm">
     {% csrf_token %}
-    <div class="pos-grid">
-        <!-- Products -->
-        <div class="card">
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <input type="text" id="productSearch" class="form-control" placeholder="Search products..." style="flex: 1;">
+    <div class="pos-layout">
+        <!-- Left Side: POS Grid -->
+        <div class="pos-products">
+            <div class="search-category-wrapper" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 8px;">
+                <div class="category-tabs" id="categoryTabs" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                    <div class="category-tab active" data-id="all">All Items</div>
+                    {% for c in categories %}
+                    <div class="category-tab" data-id="{{ c.id }}">{{ c.name }}</div>
+                    {% endfor %}
+                </div>
+                <div class="search-container" style="position: relative; width: 220px; flex-shrink: 0;">
+                    <i class='bx bx-search' style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px;"></i>
+                    <input type="text" id="productSearch" class="form-control" placeholder="Search..." style="padding-left: 34px; height: 38px; font-size: 13px;">
+                </div>
             </div>
             
-            <div class="product-list" id="productGrid">
-                {% for p in products %}
-                <div class="product-box" data-id="{{ p.id }}" data-name="{{ p.name }}" data-price="{{ p.price }}">
-                    <div style="font-weight: 700; margin-bottom: 4px;">{{ p.name }}</div>
-                    <div style="color: var(--success); font-weight: 600;">₹{{ p.price|stringformat:".2f" }}</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">Stock: {{ p.stock_quantity }}</div>
-                </div>
-                {% endfor %}
+            <div class="product-grid" id="productGrid">
+                <!-- Products dynamically rendered here -->
             </div>
         </div>
-
-        <!-- Cart -->
-        <div class="cart-box">
-            <h3 style="margin-bottom: 16px;">Order Summary</h3>
-            <div style="margin-bottom: 16px;">
-                <input type="text" name="customer_name" class="form-control" placeholder="Customer Name" style="margin-bottom: 8px;">
-                <input type="text" name="customer_phone" class="form-control" placeholder="Phone">
+        
+        <!-- Right Side: Cart Details & Calculation -->
+        <div class="glass-panel pos-cart" id="posCartSection" style="padding: 24px;">
+            <div class="cart-header">
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--text-main);">Current Order</h3>
+                <button type="button" onclick="clearCart()" class="btn-danger" style="padding: 6px 12px; border-radius: 8px; font-size: 12px; border: none; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                    <i class='bx bx-trash'></i> Clear All
+                </button>
             </div>
 
-            <div style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
-                <table style="width: 100%; font-size: 13px;">
+            <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+                <input type="text" name="customer_name" class="form-control" placeholder="Customer Name" style="font-size: 13px;">
+                <input type="text" name="customer_phone" class="form-control" placeholder="Phone Number" style="font-size: 13px;">
+            </div>
+            
+            <div class="cart-items">
+                <table id="billTable">
                     <thead>
                         <tr>
                             <th>Item</th>
@@ -82,119 +277,284 @@
                             <th></th>
                         </tr>
                     </thead>
-                    <tbody id="cartItems">
-                        <!-- JS populated -->
+                    <tbody id="billItems">
+                        <!-- Iterms will be added here via JS -->
                     </tbody>
                 </table>
+                <div id="emptyCartMsg" style="text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 14px;">
+                    Cart is empty.<br>Click items to add.
+                </div>
             </div>
-
-            <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            
+            <hr style="border: 1px solid var(--glass-border); margin: 16px 0;">
+            
+            <div style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
                     <span>Subtotal:</span>
-                    <span id="subtotal">₹0.00</span>
+                    <span id="subtotalDisplay">₹0.00</span>
                 </div>
-                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                    <input type="number" name="discount" id="discount" class="form-control" placeholder="Disc" value="0">
-                    <input type="number" name="gst" id="gst" class="form-control" placeholder="GST %" value="0">
+                
+                <div style="display: flex; gap: 12px; margin-bottom: 8px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 12px; color: var(--text-muted);">Discount (₹)</label>
+                        <input type="number" name="discount" id="discountInput" class="form-control" value="0.00" step="0.01" style="padding: 6px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 12px; color: var(--text-muted);">GST (%)</label>
+                        <input type="number" name="gst" id="gstInput" class="form-control" value="0.00" step="0.01" style="padding: 6px;">
+                    </div>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 20px; color: var(--primary-dark); margin-bottom: 20px;">
-                    <span>Total:</span>
-                    <span id="grandTotal">₹0.00</span>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Generate Bill</button>
             </div>
+            
+            <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+                <span style="font-size: 16px; color: var(--text-muted); font-weight: 600;">Grand Total</span>
+                <span id="grandTotalDisplay" style="font-size: 32px; font-weight: 800; color: var(--primary-dark); letter-spacing: -1px;">₹0.00</span>
+            </div>
+            
+            <button type="submit" class="btn btn-success" style="width: 100%; justify-content: center; padding: 16px; font-size: 16px;">
+                <i class='bx bx-check-circle'></i> Complete Sale
+            </button>
         </div>
     </div>
 </form>
 
+<div class="mobile-cart-bar" id="mobileCartBar" onclick="document.getElementById('posCartSection').scrollIntoView({behavior: 'smooth'})">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <i class='bx bx-shopping-bag' style="font-size: 20px;"></i>
+        </div>
+        <div>
+            <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; opacity: 0.8;">In Cart</div>
+            <div style="font-size: 14px; font-weight: 700;" id="mobileCartCount">0 Items</div>
+        </div>
+    </div>
+    <div style="text-align: right;">
+        <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; opacity: 0.8;">Total</div>
+        <div style="font-size: 18px; font-weight: 800;" id="mobileCartTotal">₹0.00</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
 <script>
-    // Handle product box clicks via delegation
-    document.getElementById('productGrid').addEventListener('click', (e) => {
-        const productBox = e.target.closest('.product-box');
-        if (productBox) {
-            const id = productBox.getAttribute('data-id');
-            const name = productBox.getAttribute('data-name');
-            const price = parseFloat(productBox.getAttribute('data-price'));
-            addToCart(id, name, price);
-        }
+    const productsData = JSON.parse('{{ products_json|escapejs }}');
+    const productsMap = {};
+    const cart = {}; // productId -> quantity
+    productsData.forEach(p => {
+        productsMap[p.id] = p;
+        p.liveStock = p.stock; // keep track of front-end stock
     });
 
-    function addToCart(id, name, price) {
-        if (!cart[id]) {
-            cart[id] = { name, price, qty: 1 };
-        } else {
-            cart[id].qty += 1;
-        }
-        updateCart();
-    }
+    const grid = document.getElementById('productGrid');
+    const categoryTabs = document.querySelectorAll('.category-tab');
+    
+    // UI Elements
+    const billItemsBody = document.getElementById('billItems');
+    const emptyCartMsg = document.getElementById('emptyCartMsg');
+    const subtotalDisplay = document.getElementById('subtotalDisplay');
+    const grandTotalDisplay = document.getElementById('grandTotalDisplay');
+    const discountInput = document.getElementById('discountInput');
+    const gstInput = document.getElementById('gstInput');
+    const searchInput = document.getElementById('productSearch');
+    
+    let currentCategoryId = 'all';
+    let searchQuery = '';
 
-    function removeOne(id) {
-        if (cart[id]) {
-            cart[id].qty -= 1;
-            if (cart[id].qty <= 0) delete cart[id];
-        }
-        updateCart();
-    }
-
-    function removeAll(id) {
-        delete cart[id];
-        updateCart();
-    }
-
-    function updateCart() {
-        const tbody = document.getElementById('cartItems');
-        tbody.innerHTML = '';
-        let subtotal = 0;
-
-        for (const id in cart) {
-            const item = cart[id];
-            const itemTotal = item.price * item.qty;
-            subtotal += itemTotal;
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>
-                    <b>${item.name}</b><br>
-                    <small>₹${item.price.toFixed(2)}</small>
-                    <input type="hidden" name="product_id[]" value="${id}">
-                    <input type="hidden" name="quantity[]" value="${item.qty}">
-                </td>
-                <td>
-                    <button type="button" onclick="removeOne(${id})" style="border:none; cursor:pointer;">-</button>
-                    ${item.qty}
-                    <button type="button" onclick="addToCart(${id}, '${item.name}', ${item.price})" style="border:none; cursor:pointer;">+</button>
-                </td>
-                <td style="text-align: right;">₹${itemTotal.toFixed(2)}</td>
-                <td><button type="button" onclick="removeAll(${id})" style="color:var(--danger); border:none; background:none; cursor:pointer;">x</button></td>
+    function renderGrid() {
+        grid.innerHTML = '';
+        productsData.forEach(p => {
+            if (currentCategoryId !== 'all' && p.category_id != currentCategoryId) return;
+            if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return;
+            
+            const card = document.createElement('div');
+            card.className = `product-card ${p.liveStock <= 0 ? 'out-of-stock' : ''}`;
+            card.id = `card-${p.id}`;
+            card.onclick = () => addToCart(p.id, card);
+            
+            let imgHTML = p.image_url ? 
+                `<img src="${p.image_url}" class="product-image" alt="${p.name}">` : 
+                `<div class="product-image"><i class='bx bx-cube' style="font-size: 40px; color: var(--text-muted); opacity: 0.3;"></i></div>`;
+                
+            card.innerHTML = `
+                ${imgHTML}
+                <div class="product-name">${p.name}</div>
+                <div class="product-price">₹${p.price.toLocaleString('en-IN', {minimumFractionDigits: 2})}</div>
+                <div class="product-stock">Stock: <span id="livestock-${p.id}">${p.liveStock}</span></div>
+                ${cart[p.id] ? `<div class="stock-badge" id="badge-${p.id}">${cart[p.id]}</div>` : ''}
             `;
-            tbody.appendChild(row);
-        }
-
-        document.getElementById('subtotal').innerText = '₹' + subtotal.toFixed(2);
-        calculateFinal(subtotal);
+            grid.appendChild(card);
+        });
     }
 
-    function calculateFinal(subtotal) {
-        const disc = parseFloat(document.getElementById('discount').value) || 0;
-        const gst = parseFloat(document.getElementById('gst').value) || 0;
-        
-        let final = subtotal - disc;
-        if (final < 0) final = 0;
-        final = final + (final * gst / 100);
-        
-        document.getElementById('grandTotal').innerText = '₹' + final.toFixed(2);
-    }
+    searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderGrid();
+    });
 
-    document.getElementById('discount').addEventListener('input', () => updateCart());
-    document.getElementById('gst').addEventListener('input', () => updateCart());
-
-    // Search functionality
-    document.getElementById('productSearch').addEventListener('input', function() {
-        const q = this.value.toLowerCase();
-        document.querySelectorAll('.product-box').forEach(box => {
-            const name = box.querySelector('div').innerText.toLowerCase();
-            box.style.display = name.includes(q) ? '' : 'none';
+    categoryTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            categoryTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentCategoryId = tab.getAttribute('data-id');
+            renderGrid();
         });
     });
+
+    function clearCart() {
+        if (Object.keys(cart).length === 0) return;
+        
+        // Restore stock
+        for (const [id, qty] of Object.entries(cart)) {
+            productsMap[id].liveStock += qty;
+        }
+        
+        // Empty cart object
+        for (const id in cart) delete cart[id];
+        
+        updateCartUI();
+        renderGrid(); // Refresh badges and stock numbers
+    }
+
+    function addToCart(productId, cardElement) {
+        const product = productsMap[productId];
+        if (product.liveStock <= 0) return; // Out of stock locally
+        
+        // Anim effect
+        cardElement.classList.remove('pop-anim');
+        void cardElement.offsetWidth; // trigger reflow
+        cardElement.classList.add('pop-anim');
+        
+        if (!cart[productId]) cart[productId] = 0;
+        cart[productId] += 1;
+        product.liveStock -= 1;
+        
+        updateCartUI();
+        updateGridUI(productId);
+    }
+    
+    function removeFromCart(productId, qtyToRemove = 1) {
+        const product = productsMap[productId];
+        if (!cart[productId]) return;
+        
+        const removeCount = Math.min(cart[productId], qtyToRemove);
+        cart[productId] -= removeCount;
+        product.liveStock += removeCount;
+        
+        if (cart[productId] <= 0) {
+            delete cart[productId];
+        }
+        
+        updateCartUI();
+        updateGridUI(productId);
+    }
+
+    function updateGridUI(productId) {
+        const p = productsMap[productId];
+        const stockEl = document.getElementById(`livestock-${productId}`);
+        if(stockEl) stockEl.innerText = p.liveStock;
+        
+        const card = document.getElementById(`card-${productId}`);
+        if(card) {
+            if(p.liveStock <= 0) card.classList.add('out-of-stock');
+            else card.classList.remove('out-of-stock');
+            
+            let badge = document.getElementById(`badge-${productId}`);
+            if(cart[productId]) {
+                if(badge) badge.innerText = cart[productId];
+                else {
+                    card.insertAdjacentHTML('beforeend', `<div class="stock-badge" id="badge-${productId}">${cart[productId]}</div>`);
+                }
+            } else if(badge) {
+                badge.remove();
+            }
+        }
+    }
+
+    function updateCartUI() {
+        billItemsBody.innerHTML = '';
+        let count = 0;
+        
+        for (const [id, qty] of Object.entries(cart)) {
+            const p = productsMap[id];
+            count++;
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <div style="font-weight: 600; color: var(--text-main);">${p.name}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">₹${p.price.toLocaleString('en-IN', {minimumFractionDigits: 2})} /ea</div>
+                    <input type="hidden" name="product_id[]" value="${p.id}">
+                    <input type="hidden" name="quantity[]" value="${qty}">
+                </td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button type="button" onclick="removeFromCart(${p.id})" style="background:var(--bg-main); color:var(--text-main); border:1px solid var(--glass-outline); border-radius:6px; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;">-</button>
+                        <span style="font-weight: 600; min-width: 20px; text-align: center;">${qty}</span>
+                        <button type="button" onclick="addToCart(${p.id}, document.getElementById('card-${p.id}'))" style="background:var(--bg-main); color:var(--text-main); border:1px solid var(--glass-outline); border-radius:6px; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" ${p.liveStock <= 0 ? 'disabled' : ''}>+</button>
+                    </div>
+                </td>
+                <td style="text-align: right; color: var(--primary-dark); font-weight: 700;">
+                    ₹${(p.price * qty).toLocaleString('en-IN', {minimumFractionDigits: 2})}
+                </td>
+                <td style="text-align: right; width: 40px;">
+                    <button type="button" onclick="removeFromCart(${p.id}, ${qty})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size: 18px;" title="Remove All"><i class='bx bx-trash'></i></button>
+                </td>
+            `;
+            billItemsBody.appendChild(tr);
+        }
+        
+        if (count > 0) {
+            emptyCartMsg.style.display = 'none';
+        } else {
+            emptyCartMsg.style.display = 'block';
+        }
+        
+        recalculateTotals();
+    }
+
+    function recalculateTotals() {
+        let subtotal = 0;
+        let totalItems = 0;
+        for (const [id, qty] of Object.entries(cart)) {
+            subtotal += productsMap[id].price * qty;
+            totalItems += qty;
+        }
+        
+        subtotalDisplay.innerText = '₹' + subtotal.toLocaleString('en-IN', {minimumFractionDigits: 2});
+        
+        const discount = parseFloat(discountInput.value) || 0;
+        const gst = parseFloat(gstInput.value) || 0;
+        
+        let afterDiscount = subtotal - discount;
+        if(afterDiscount < 0) afterDiscount = 0;
+        
+        const gstAmount = (afterDiscount * gst) / 100;
+        const grandTotal = afterDiscount + gstAmount;
+        
+        const grandTotalStr = '₹' + grandTotal.toLocaleString('en-IN', {minimumFractionDigits: 2});
+        grandTotalDisplay.innerText = grandTotalStr;
+
+        // Update Mobile Cart Bar
+        const mobileBar = document.getElementById('mobileCartBar');
+        const mobileCountEl = document.getElementById('mobileCartCount');
+        const mobileTotalEl = document.getElementById('mobileCartTotal');
+
+        if (mobileBar) {
+            if (totalItems > 0) {
+                mobileBar.classList.add('active');
+                mobileCountEl.innerText = `${totalItems} Item${totalItems > 1 ? 's' : ''}`;
+                mobileTotalEl.innerText = grandTotalStr;
+            } else {
+                mobileBar.classList.remove('active');
+            }
+        }
+    }
+
+    // Bind inputs to recalculate
+    discountInput.addEventListener('input', recalculateTotals);
+    gstInput.addEventListener('input', recalculateTotals);
+
+    // Initial render
+    renderGrid();
 </script>
 {% endblock %}

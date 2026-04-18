@@ -3,72 +3,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <title>{% block title %}Shop Billing System{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=101">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=7">
+    <!-- Include Boxicons for icons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
     {% if user.is_authenticated %}
-    <nav class="navbar">
-        <a href="{% url 'dashboard' %}" class="navbar-brand">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar glass-panel" id="sidebar">
+        <div class="brand">
             <i class='bx bx-cart-alt'></i> ShopSys
-        </a>
-        <ul class="nav-menu">
+        </div>
+        <ul class="nav-links">
             <li>
                 <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                    Dashboard
+                    <i class='bx bxs-dashboard'></i> Dashboard
                 </a>
             </li>
             <li>
                 <a href="{% url 'billing' %}" class="{% if request.resolver_match.url_name == 'billing' %}active{% endif %}">
-                    Create Bill
+                    <i class='bx bx-receipt'></i> Create Bill
                 </a>
             </li>
             <li>
                 <a href="{% url 'product_list' %}" class="{% if request.resolver_match.url_name == 'product_list' %}active{% endif %}">
-                    Inventory
+                    <i class='bx bx-box'></i> Inventory
                 </a>
             </li>
             <li>
                 <a href="{% url 'reports' %}" class="{% if request.resolver_match.url_name == 'reports' %}active{% endif %}">
-                    Reports
+                    <i class='bx bx-bar-chart-alt-2'></i> Reports
                 </a>
             </li>
+            <li style="margin-top: auto;">
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background:none;border:none;width:100%;text-align:left;cursor:pointer;">
+                        <a style="display:flex;width:100%;"><i class='bx bx-log-out'></i> Logout</a>
+                    </button>
+                </form>
+            </li>
         </ul>
-        <div style="display: flex; align-items: center; gap: 16px;">
-            <span style="font-size: 14px; font-weight: 500;">{{ user.username }}</span>
-            <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;">
-                    Logout
-                </button>
-            </form>
-        </div>
-    </nav>
+    </aside>
 
-    <div class="container">
+    <main class="main-content">
+        <header class="header">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class='bx bx-menu'></i>
+                </button>
+                <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+            </div>
+            <div class="user-profile">
+                <span class="d-none-mobile">{{ user.username }}</span>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white;">
+                    <i class='bx bx-user'></i>
+                </div>
+            </div>
+        </header>
+
         {% if messages %}
             <div class="messages">
                 {% for message in messages %}
-                <div class="card message-{{ message.tags|default:'info' }}" style="padding: 12px 20px; border-left: 4px solid var(--primary);">
+                <div class="glass-panel message-{{ message.tags|default:'info' }}" style="padding: 12px 20px; margin-bottom: 20px;">
                     {{ message }}
                 </div>
                 {% endfor %}
             </div>
         {% endif %}
 
-        <h1 style="margin-bottom: 24px; font-size: 24px; font-weight: 700;">{% block page_title %}{% endblock %}</h1>
-        
         {% block content %}
         {% endblock %}
-    </div>
+    </main>
     {% else %}
         {% block login_content %}
         {% endblock %}
     {% endif %}
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            if (menuToggle && sidebar && overlay) {
+                const toggleSidebar = () => {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                    document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+                };
+
+                menuToggle.addEventListener('click', toggleSidebar);
+                overlay.addEventListener('click', toggleSidebar);
+
+                // Close sidebar on link click (mobile)
+                sidebar.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (window.innerWidth <= 1024) {
+                            toggleSidebar();
+                        }
+                    });
+                });
+            }
+        });
+    </script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

@@ -4,70 +4,166 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
-{% block page_title %}Sales Reports{% endblock %}
+{% block page_title %}Sales Intelligence{% endblock %}
 
 {% block content %}
 <div class="dashboard-grid">
-    <div class="card stat-card" style="border-top: 4px solid var(--success);">
-        <div class="stat-title">Today</div>
-        <div class="stat-value">₹{{ today_revenue|default:"0"|stringformat:".2f" }}</div>
+    <!-- Today -->
+    <div class="glass-panel stat-card success">
+        <div class="stat-title" style="color: var(--success);">Today's Revenue</div>
+        <div class="stat-value">₹{{ today_revenue|default:"0.00"|stringformat:".2f" }}</div>
+        <div class="stat-subtitle" style="font-weight:600;">{{ today_count }} bills generated</div>
+        <div class="stat-icon" style="color: var(--success); opacity: 0.2;"><i class='bx bx-calendar-check'></i></div>
     </div>
-    <div class="card stat-card" style="border-top: 4px solid var(--primary);">
-        <div class="stat-title">This Week</div>
-        <div class="stat-value">₹{{ weekly_revenue|default:"0"|stringformat:".2f" }}</div>
+
+    <!-- Weekly -->
+    <div class="glass-panel stat-card primary">
+        <div class="stat-title" style="color: var(--primary);">Weekly Revenue</div>
+        <div class="stat-value">₹{{ weekly_revenue|default:"0.00"|stringformat:".2f" }}</div>
+        <div class="stat-subtitle" style="font-weight:600;">{{ weekly_count }} bills (7 days)</div>
+        <div class="stat-icon" style="color: var(--primary); opacity: 0.2;"><i class='bx bx-calendar-event'></i></div>
     </div>
-    <div class="card stat-card" style="border-top: 4px solid var(--warning);">
-        <div class="stat-title">This Month</div>
-        <div class="stat-value">₹{{ monthly_revenue|default:"0"|stringformat:".2f" }}</div>
+
+    <!-- Monthly -->
+    <div class="glass-panel stat-card warning">
+        <div class="stat-title" style="color: var(--warning);">Monthly Revenue</div>
+        <div class="stat-value">₹{{ monthly_revenue|default:"0.00"|stringformat:".2f" }}</div>
+        <div class="stat-subtitle" style="font-weight:600;">{{ monthly_count }} bills (30 days)</div>
+        <div class="stat-icon" style="color: var(--warning); opacity: 0.2;"><i class='bx bx-calendar-star'></i></div>
+    </div>
+
+    <!-- Yearly -->
+    <div class="glass-panel stat-card danger">
+        <div class="stat-title" style="color: var(--danger);">Yearly Revenue</div>
+        <div class="stat-value">₹{{ yearly_revenue|default:"0.00"|stringformat:".2f" }}</div>
+        <div class="stat-subtitle" style="font-weight:600;">{{ yearly_count }} bills (Year)</div>
+        <div class="stat-icon" style="color: var(--danger); opacity: 0.15;"><i class='bx bx-calendar-alt'></i></div>
     </div>
 </div>
 
-<div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-        <h3 style="font-size: 18px;">Performance Table</h3>
-        <div style="display: flex; gap: 8px;">
-            <button class="btn" style="background:var(--bg-main); font-size: 12px;" onclick="switchSummary('today')">Today</button>
-            <button class="btn" style="background:var(--bg-main); font-size: 12px;" onclick="switchSummary('weekly')">Week</button>
-            <button class="btn" style="background:var(--bg-main); font-size: 12px;" onclick="switchSummary('monthly')">Month</button>
+<div class="glass-panel" style="padding: 24px; margin-top: 32px; background: white;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px; margin-bottom: 32px;">
+        <div>
+            <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: var(--text-main);">Performance Analysis</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Analyze sales breakdowns by time period.</p>
+        </div>
+        <div class="filter-group" style="overflow-x: auto; max-width: 100%;">
+            <button class="filter-btn active" onclick="switchSummary('today')">Today</button>
+            <button class="filter-btn" onclick="switchSummary('weekly')">Weekly</button>
+            <button class="filter-btn" onclick="switchSummary('monthly')">Monthly</button>
+            <button class="filter-btn" onclick="switchSummary('yearly')">Yearly</button>
         </div>
     </div>
+    
+    <style>
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 40px;
+        }
+        @media (max-width: 1024px) {
+            .analysis-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+        .chart-container {
+            background: white;
+            border: 1px solid var(--glass-outline);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-sm);
+            height: 400px;
+        }
+    </style>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th style="text-align: center;">Qty</th>
-                    <th style="text-align: right;">Revenue</th>
-                </tr>
-            </thead>
-            <tbody id="summary-table-body">
-                <!-- Javascript populated -->
-            </tbody>
-        </table>
+    <!-- Visual Chart Section -->
+    <div class="chart-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main);">Revenue Trend</h3>
+            <div id="chart-period-badge" class="badge badge-primary">Today</div>
+        </div>
+        <div style="height: 320px; position: relative;">
+            <canvas id="salesChart"></canvas>
+        </div>
     </div>
-</div>
+    <div class="analysis-grid">
+        <!-- Stats summary -->
+        <div class="insight-card" style="padding: 32px; border: 1px solid var(--glass-outline); background: var(--bg-main); border-radius: 20px; height: fit-content; position: relative; overflow: hidden;">
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700;">Active Insights</div>
+            <div id="summary-value" style="font-size: 36px; font-weight: 800; margin: 16px 0; color: var(--text-main); letter-spacing: -1px;">₹{{ today_revenue|default:"0.00" }}</div>
+            <div id="summary-subtitle" class="badge badge-success" style="display: inline-block; margin-bottom: 12px;">{{ today_count }} Sales Generated</div>
+            <p id="summary-meta" style="font-size: 14px; line-height: 1.6; color: var(--text-muted);">Your shop analytics are currently showing performance for the selected period.</p>
+            <i class='bx bx-analyse' style="position: absolute; right: -20px; bottom: -24px; font-size: clamp(100px, 20vw, 150px); opacity: 0.03;"></i>
+        </div>
 
-<div class="card">
-    <h3 style="margin-bottom: 20px; font-size: 18px;">Revenue Trend</h3>
-    <div style="height: 300px;">
-        <canvas id="salesChart"></canvas>
+        <!-- Itemized Sales Table -->
+        <div class="glass-panel" style="background: white; border: 1px solid var(--glass-outline); padding: 0; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow-sm);">
+            <div style="padding: 20px 24px; background: var(--bg-main); border-bottom: 1px solid var(--glass-outline); font-weight: 800; font-size: 14px; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                <i class='bx bx-list-check' style="color: var(--primary); font-size: 24px;"></i> Itemized Breakdown
+            </div>
+            <div class="premium-table-container" style="max-height: 500px; overflow-y: auto;">
+                <table class="premium-table">
+                    <thead style="position: sticky; top: 0; background: var(--bg-main); z-index: 10;">
+                        <tr class="no-hover">
+                            <th>Item Name</th>
+                            <th>Unit Price</th>
+                            <th style="text-align: center;">Qty</th>
+                            <th style="text-align: right;">Total Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summary-table-body">
+                        <!-- populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="summary-table-footer" style="padding: 24px; background: var(--bg-main); border-top: 2px solid var(--glass-outline); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
+                <div style="font-weight: 800; color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Period Totals</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 24px; justify-content: flex-end; flex: 1;">
+                    <div style="text-align: right; min-width: 80px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Total Units</div>
+                        <div id="total-qty" style="font-size: 20px; font-weight: 800; color: var(--text-main);">0</div>
+                    </div>
+                    <div style="text-align: right; min-width: 120px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Grand Revenue</div>
+                        <div id="total-amount" style="font-size: 20px; font-weight: 800; color: var(--primary-dark);">₹0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     const summaryData = {
         today: {
+            revenue: '₹{{ today_revenue|default:"0.00"|stringformat:".2f" }}',
+            count: '{{ today_count }} Sales Generated',
+            meta: 'Showing data for today. Business is moving well!',
             items: JSON.parse('{{ today_items_json|escapejs }}'),
             trend: JSON.parse('{{ today_trend_json|escapejs }}')
         },
         weekly: {
+            revenue: '₹{{ weekly_revenue|default:"0.00"|stringformat:".2f" }}',
+            count: '{{ weekly_count }} Sales Generated',
+            meta: 'Showing aggregated data for the last 7 calendar days.',
             items: JSON.parse('{{ weekly_items_json|escapejs }}'),
             trend: JSON.parse('{{ weekly_trend_json|escapejs }}')
         },
         monthly: {
+            revenue: '₹{{ monthly_revenue|default:"0.00"|stringformat:".2f" }}',
+            count: '{{ monthly_count }} Sales Generated',
+            meta: 'Showing a bird\'s eye view of the last 30 business days.',
             items: JSON.parse('{{ monthly_items_json|escapejs }}'),
             trend: JSON.parse('{{ monthly_trend_json|escapejs }}')
+        },
+        yearly: {
+            revenue: '₹{{ yearly_revenue|default:"0.00"|stringformat:".2f" }}',
+            count: '{{ yearly_count }} Sales Generated',
+            meta: 'This is your performance ledger for the current financial year.',
+            items: JSON.parse('{{ yearly_items_json|escapejs }}'),
+            trend: JSON.parse('{{ yearly_trend_json|escapejs }}')
         }
     };
     
@@ -80,52 +176,173 @@
             data: {
                 labels: [],
                 datasets: [{
-                    label: 'Revenue',
+                    label: 'Revenue (₹)',
                     data: [],
-                    borderColor: '#3b82f6',
-                    borderWidth: 2,
-                    fill: false,
-                    tension: 0.1
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderColor: 'rgb(99, 102, 241)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgb(99, 102, 241)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
                 scales: {
-                    y: { beginAtZero: true }
+                    y: {
+                        beginAtZero: true,
+                        grid: { display: false },
+                        ticks: {
+                            callback: function(value) { return '₹' + value; }
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
                 }
             }
         });
     }
 
+    function updateChart(period) {
+        if (!salesChart) return;
+        
+        const data = summaryData[period];
+        const labels = data.trend.map(item => item.label);
+        const values = data.trend.map(item => item.value);
+
+        salesChart.data.labels = labels;
+        salesChart.data.datasets[0].data = values;
+        
+        // Update colors based on period
+        const colors = {
+            today: 'rgba(16, 185, 129, 0.7)',
+            weekly: 'rgba(99, 102, 241, 0.7)',
+            monthly: 'rgba(245, 158, 11, 0.7)',
+            yearly: 'rgba(239, 68, 68, 0.7)'
+        };
+        const borderColors = {
+            today: '#10b981',
+            weekly: '#6366f1',
+            monthly: '#f59e0b',
+            yearly: '#ef4444'
+        };
+        
+        salesChart.data.datasets[0].backgroundColor = colors[period].replace('0.7', '0.1');
+        salesChart.data.datasets[0].borderColor = borderColors[period];
+        salesChart.data.datasets[0].pointBackgroundColor = borderColors[period];
+        
+        salesChart.update();
+        document.getElementById('chart-period-badge').innerText = period.charAt(0).toUpperCase() + period.slice(1);
+    }
+
     function switchSummary(period) {
         const data = summaryData[period];
+        
+        // Update values
+        document.getElementById('summary-value').innerText = data.revenue;
+        document.getElementById('summary-subtitle').innerText = data.count;
+        document.getElementById('summary-meta').innerText = data.meta;
+
+        // Update table
         const tbody = document.getElementById('summary-table-body');
+        const footer = document.getElementById('summary-table-footer');
         tbody.innerHTML = '';
         
+        let grandTotalQty = 0;
+        let grandTotalAmount = 0;
+
         if (data.items.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">No data.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="padding: 80px; text-align: center; color: var(--text-muted);"><i class=\'bx bx-info-circle\' style=\'font-size: 32px; opacity: 0.2; margin-bottom: 12px; display: block;\'></i>No sales activity found for this period.</td></tr>';
+            footer.style.opacity = '0.5';
+            document.getElementById('total-qty').innerText = '0';
+            document.getElementById('total-amount').innerText = '₹0.00';
         } else {
+            footer.style.opacity = '1';
             data.items.forEach(item => {
+                grandTotalQty += item.qty;
+                grandTotalAmount += item.total;
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${item.name}</td>
-                    <td style="text-align: center;">${item.qty}</td>
-                    <td style="text-align: right; font-weight: 700;">₹${item.total.toFixed(2)}</td>
+                    <td style="padding: 16px 24px; font-weight: 700;">${item.name}</td>
+                    <td style="padding: 16px 24px; color: var(--text-muted);">₹${item.price.toFixed(2)}</td>
+                    <td style="padding: 16px 24px; text-align: center;"><span class="badge badge-primary">${item.qty}</span></td>
+                    <td style="padding: 16px 24px; text-align: right; font-weight: 800; color: var(--primary-dark);">₹${item.total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                 `;
                 tbody.appendChild(row);
             });
+            
+            // Update Totals
+            document.getElementById('total-qty').innerText = grandTotalQty;
+            document.getElementById('total-amount').innerText = `₹${grandTotalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         }
 
-        // Chart Update
-        salesChart.data.labels = data.trend.map(t => t.label);
-        salesChart.data.datasets[0].data = data.trend.map(t => t.value);
-        salesChart.update();
+        // Update Chart
+        updateChart(period);
+        
+        // Update active button
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.innerText.toLowerCase() === period) {
+                btn.classList.add('active');
+            }
+        });
     }
 
+    // Initialize with today's data
     window.onload = () => {
         initChart();
         switchSummary('today');
     };
 </script>
+
+<style>
+    .filter-group {
+        display: flex;
+        background: var(--bg-main);
+        padding: 6px;
+        border-radius: 14px;
+        border: 1px solid var(--glass-outline);
+    }
+    
+    .filter-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 13px;
+        transition: var(--transition);
+    }
+    
+    .filter-btn:hover {
+        color: var(--primary);
+        background: rgba(99, 102, 241, 0.05);
+    }
+    
+    .filter-btn.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 8px 16px var(--primary-glow);
+    }
+
+    .insight-card {
+        animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 {% endblock %}
