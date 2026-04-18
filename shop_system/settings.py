@@ -134,7 +134,7 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.StaticFilesStorage",
     },
 }
-
+STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 # ================= DEFAULT FIELD =================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
