@@ -139,8 +139,6 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
-
 # WhiteNoise settings for production
 if not DEBUG:
    WHITENOISE_ALLOW_ALL_ORIGINS = True
@@ -183,7 +181,7 @@ STORAGES = {
         "BACKEND": DEFAULT_STORAGE,
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
