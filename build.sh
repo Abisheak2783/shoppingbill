@@ -10,3 +10,6 @@ rm -rf staticfiles
 # run build commands
 python manage.py collectstatic --no-input
 python manage.py migrate
+
+# Create superuser if it doesn't exist
+python scripts/create_superuser.py

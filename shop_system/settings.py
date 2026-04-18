@@ -141,7 +141,7 @@ STORAGES = {
         "BACKEND": DEFAULT_STORAGE,
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.StaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
@@ -153,7 +153,12 @@ STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
 
 # WhiteNoise settings
 if not DEBUG:
-   WHITENOISE_MANIFEST_STRICT = False
+    WHITENOISE_MANIFEST_STRICT = False
+    # Security enhancement for production
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 # ================= OTHER =================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
