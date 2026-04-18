@@ -4,10 +4,14 @@ import sys
 from django.core.management import call_command
 
 def init_production():
-    # Add project root to path
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    # Force Absolute Project Root
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    sys.path.append(project_root)
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop_system.settings')
     django.setup()
+    
+    print(f"DEBUG: Current Working Directory: {os.getcwd()}")
+    print(f"DEBUG: Project Root: {project_root}")
     
     # 1. Run Migrations & Collectstatic
     print("Running database migrations...")
@@ -16,56 +20,49 @@ def init_production():
     print("Running runtime collectstatic (Guarantee phase)...")
     call_command('collectstatic', interactive=False, clear=True)
     
-    # 2. Check for Data Transfer file and Load it
-    data_file = os.path.join(os.environ.get('BASE_DIR', os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data_transfer.json')
+    # 2. Aggressive Data Transfer File Search
+    # We look in the root folder for data_transfer.json
+    data_file = os.path.join(project_root, 'data_transfer.json')
+    
+    print(f"Checking for data file at: {data_file}")
+    
     if os.path.exists(data_file):
-        print(f"FOUND data transfer file: {data_file}. Loading data...")
+        print(f"SUCCESS: Found data transfer file. Size: {os.path.getsize(data_file)} bytes.")
+        print("Loading data into production database...")
         try:
-            call_command('loaddata', data_file)
+            # We use verbosity=2 to see what is happening in the logs
+            call_command('loaddata', data_file, verbosity=2)
             print("Data loaded successfully.")
         except Exception as e:
-            print(f"ERROR loading data: {e}")
+            print(f"ERROR: Failed to load data: {e}")
     else:
-        print("No data transfer file found. Skipping data import.")
-    
-    # 2. Ensure Superuser exists and has correct password
+        print("WARNING: data_transfer.json NOT FOUND in root. Searching recursively...")
+        found = False
+        for root, dirs, files in os.walk(project_root):
+            if 'data_transfer.json' in files:
+                found_path = os.path.join(root, 'data_transfer.json')
+                print(f"FOUND recursively at: {found_path}")
+                try:
+                    call_command('loaddata', found_path, verbosity=2)
+                    print("Data loaded successfully from recursive path.")
+                    found = True
+                    break
+                except Exception as e:
+                    print(f"ERROR: Failed to load from recursive path: {e}")
+        if not found:
+            print("CRITICAL: data_transfer.json is missing from the entire project!")
+
+    # 3. Ensure Superuser exists
     from django.contrib.auth import get_user_model
     User = get_user_model()
-    
-    username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
-    email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@example.com')
-    password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin123')
-    
-    user, created = User.objects.get_or_create(username=username, defaults={'email': email})
-    
-    if created:
-        print(f"Created new superuser: {username}")
-    else:
-        print(f"Updating existing superuser: {username}")
-    
+    username = 'admin'
+    password = 'admin123'
+    user, created = User.objects.get_or_create(username=username, defaults={'email': 'admin@example.com'})
     user.set_password(password)
     user.is_superuser = True
     user.is_staff = True
     user.save()
-    print(f"Password for {username} is GUARANTEED to be 'admin123'.")
-    
-    # 3. Diagnostic: Check and Log static files existence
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    static_root = os.path.join(project_root, 'staticfiles')
-    css_dir = os.path.join(static_root, 'css')
-    
-    print(f"Diagnostic: Project root: {project_root}")
-    print(f"Diagnostic: Static root: {static_root}")
-    
-    if os.path.exists(static_root):
-        file_count = sum([len(files) for r, d, files in os.walk(static_root)])
-        print(f"Diagnostic: SUCCESS - {file_count} static files found in staticfiles directory.")
-        
-        if os.path.exists(css_dir):
-            css_files = os.listdir(css_dir)
-            print(f"Diagnostic: CSS folder contents: {css_files}")
-    else:
-        print("Diagnostic: ERROR - staticfiles directory NOT FOUND!")
+    print(f"User {username} is ready.")
 
 if __name__ == '__main__':
     init_production()
