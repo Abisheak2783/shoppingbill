@@ -237,9 +237,9 @@
         <div class="pos-products">
             <div class="search-category-wrapper" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 8px;">
                 <div class="category-tabs" id="categoryTabs" style="flex: 1; min-width: 200px; margin-bottom: 0;">
-                    <div class="category-tab active" data-id="all">All Items</div>
+                    <div class="category-tab active" data-id="all">All Items ({{ products|length }})</div>
                     {% for c in categories %}
-                    <div class="category-tab" data-id="{{ c.id }}">{{ c.name }}</div>
+                    <div class="category-tab" data-id="{{ c.id }}">{{ c.name }} ({{ c.product_count }})</div>
                     {% endfor %}
                 </div>
                 <div class="search-container" style="position: relative; width: 220px; flex-shrink: 0;">

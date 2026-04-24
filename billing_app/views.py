@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Sum, F, Count
+from django.db.models import Sum, F, Count, Q
 from django.db.models.functions import TruncHour, TruncDay, TruncMonth
 from django.utils import timezone
 import datetime
@@ -267,7 +267,9 @@ def billing_view(request):
             return redirect('billing')
             
     products = Product.objects.filter(stock_quantity__gt=0).order_by('name')
-    categories = Category.objects.all().order_by('name')
+    categories = Category.objects.annotate(
+        product_count=Count('product', filter=Q(product__stock_quantity__gt=0))
+    ).order_by('name')
     
     # converting to list of dicts to safely pass to JS template as json
     products_list = []

@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    import os
+    env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+    load_dotenv(dotenv_path=env_path)
 except ImportError:
     pass
 
@@ -128,7 +130,7 @@ if os.path.exists(STATICFILES_DIRS[0]):
 else:
     print(f"DEBUG: Static directory MISSING locally!")
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # ================= CLOUDINARY CONFIG =================

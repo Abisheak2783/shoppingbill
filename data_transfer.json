@@ -1,442 +1,478 @@
 [
 {
-  "model": "billing_app.category",
-  "pk": 1,
-  "fields": {
-    "name": "rice",
-    "description": null
-  }
+    "model": "billing_app.category",
+    "pk": 1,
+    "fields": {
+        "name": "rice",
+        "description": null
+    }
 },
 {
-  "model": "billing_app.category",
-  "pk": 2,
-  "fields": {
-    "name": "idly rice",
-    "description": null
-  }
+    "model": "billing_app.category",
+    "pk": 2,
+    "fields": {
+        "name": "idly rice",
+        "description": null
+    }
 },
 {
-  "model": "billing_app.category",
-  "pk": 3,
-  "fields": {
-    "name": "cow feed",
-    "description": null
-  }
+    "model": "billing_app.category",
+    "pk": 3,
+    "fields": {
+        "name": "cow feed",
+        "description": null
+    }
 },
 {
-  "model": "billing_app.product",
-  "pk": 1,
-  "fields": {
-    "name": "Gopuram",
-    "category": 1,
-    "image": "product_images/gopuram.jpeg",
-    "price": "1500.00",
-    "stock_quantity": 142,
-    "low_stock_threshold": 10,
-    "created_at": "2026-04-09T05:09:22.354Z"
-  }
+    "model": "billing_app.product",
+    "pk": 1,
+    "fields": {
+        "name": "Gopuram",
+        "category": 1,
+        "image": "media/product_images/product_images/gopuram_xmiuzh",
+        "price": "1500.00",
+        "stock_quantity": 142,
+        "low_stock_threshold": 10,
+        "created_at": "2026-04-09T05:09:22.354Z"
+    }
 },
 {
-  "model": "billing_app.product",
-  "pk": 2,
-  "fields": {
-    "name": "Bullet",
-    "category": 1,
-    "image": "product_images/bullet.jpeg",
-    "price": "1400.00",
-    "stock_quantity": 142,
-    "low_stock_threshold": 10,
-    "created_at": "2026-04-09T06:35:35.147Z"
-  }
+    "model": "billing_app.product",
+    "pk": 2,
+    "fields": {
+        "name": "Bullet",
+        "category": 1,
+        "image": "media/product_images/product_images/bullet_khms4u",
+        "price": "1400.00",
+        "stock_quantity": 142,
+        "low_stock_threshold": 10,
+        "created_at": "2026-04-09T06:35:35.147Z"
+    }
 },
 {
-  "model": "billing_app.product",
-  "pk": 3,
-  "fields": {
-    "name": "Padayappa Ponni Rice",
-    "category": 1,
-    "image": "product_images/26-kg-super-star-padayappa-ponni-rice.jpg",
-    "price": "1300.00",
-    "stock_quantity": 75,
-    "low_stock_threshold": 10,
-    "created_at": "2026-04-15T05:30:52.324Z"
-  }
+    "model": "billing_app.product",
+    "pk": 3,
+    "fields": {
+        "name": "Padayappa Ponni Rice",
+        "category": 1,
+        "image": "media/product_images/product_images/26-kg-super-star-padayappa-ponni-rice_frbt0z",
+        "price": "1300.00",
+        "stock_quantity": 75,
+        "low_stock_threshold": 10,
+        "created_at": "2026-04-15T05:30:52.324Z"
+    }
 },
 {
-  "model": "billing_app.product",
-  "pk": 4,
-  "fields": {
-    "name": "SS  Ponni Rice",
-    "category": 1,
-    "image": "product_images/ss-rajabhogam-ponni-rice.webp",
-    "price": "1700.00",
-    "stock_quantity": 118,
-    "low_stock_threshold": 10,
-    "created_at": "2026-04-15T05:41:11.357Z"
-  }
+    "model": "billing_app.product",
+    "pk": 4,
+    "fields": {
+        "name": "SS  Ponni Rice",
+        "category": 1,
+        "image": "media/product_images/product_images/ss-rajabhogam-ponni-rice_gmprhf",
+        "price": "1700.00",
+        "stock_quantity": 118,
+        "low_stock_threshold": 10,
+        "created_at": "2026-04-15T05:41:11.357Z"
+    }
 },
 {
-  "model": "billing_app.product",
-  "pk": 5,
-  "fields": {
-    "name": "orange idly rice",
-    "category": 2,
-    "image": "product_images/organe_idly_rice.png",
-    "price": "1199.99",
-    "stock_quantity": 50,
-    "low_stock_threshold": 5,
-    "created_at": "2026-04-15T05:43:02.471Z"
-  }
+    "model": "billing_app.product",
+    "pk": 5,
+    "fields": {
+        "name": "orange idly rice",
+        "category": 2,
+        "image": "media/product_images/product_images/organe_idly_rice_bdqto9",
+        "price": "1199.99",
+        "stock_quantity": 50,
+        "low_stock_threshold": 5,
+        "created_at": "2026-04-15T05:43:02.471Z"
+    }
 },
 {
-  "model": "billing_app.product",
-  "pk": 6,
-  "fields": {
-    "name": "Aduku Malli - Idly Rice",
-    "category": 2,
-    "image": "product_images/Aduku_malli-idly_rice.png",
-    "price": "1150.00",
-    "stock_quantity": 48,
-    "low_stock_threshold": 5,
-    "created_at": "2026-04-15T05:46:26.175Z"
-  }
+    "model": "billing_app.product",
+    "pk": 6,
+    "fields": {
+        "name": "Aduku Malli - Idly Rice",
+        "category": 2,
+        "image": "media/product_images/product_images/Aduku_malli-idly_rice_jlpddy",
+        "price": "1150.00",
+        "stock_quantity": 48,
+        "low_stock_threshold": 5,
+        "created_at": "2026-04-15T05:46:26.175Z"
+    }
 },
 {
-  "model": "billing_app.bill",
-  "pk": 1,
-  "fields": {
-    "admin_user": 1,
-    "customer_name": "",
-    "customer_phone": "",
-    "total_amount": "4500.00",
-    "discount": "0.00",
-    "gst_amount": "0.00",
-    "final_amount": "4500.00",
-    "created_at": "2026-04-09T06:36:23.861Z"
-  }
+    "model": "billing_app.bill",
+    "pk": 1,
+    "fields": {
+        "admin_user": 1,
+        "customer_name": "",
+        "customer_phone": "",
+        "total_amount": "4500.00",
+        "discount": "0.00",
+        "gst_amount": "0.00",
+        "final_amount": "4500.00",
+        "created_at": "2026-04-09T06:36:23.861Z"
+    }
 },
 {
-  "model": "billing_app.bill",
-  "pk": 2,
-  "fields": {
-    "admin_user": 1,
-    "customer_name": "",
-    "customer_phone": "",
-    "total_amount": "1500.00",
-    "discount": "0.00",
-    "gst_amount": "0.00",
-    "final_amount": "1500.00",
-    "created_at": "2026-04-09T07:11:39.987Z"
-  }
+    "model": "billing_app.bill",
+    "pk": 2,
+    "fields": {
+        "admin_user": 1,
+        "customer_name": "",
+        "customer_phone": "",
+        "total_amount": "1500.00",
+        "discount": "0.00",
+        "gst_amount": "0.00",
+        "final_amount": "1500.00",
+        "created_at": "2026-04-09T07:11:39.987Z"
+    }
 },
 {
-  "model": "billing_app.bill",
-  "pk": 3,
-  "fields": {
-    "admin_user": 1,
-    "customer_name": "",
-    "customer_phone": "",
-    "total_amount": "3000.00",
-    "discount": "0.00",
-    "gst_amount": "0.00",
-    "final_amount": "3000.00",
-    "created_at": "2026-04-09T07:12:15.856Z"
-  }
+    "model": "billing_app.bill",
+    "pk": 3,
+    "fields": {
+        "admin_user": 1,
+        "customer_name": "",
+        "customer_phone": "",
+        "total_amount": "3000.00",
+        "discount": "0.00",
+        "gst_amount": "0.00",
+        "final_amount": "3000.00",
+        "created_at": "2026-04-09T07:12:15.856Z"
+    }
 },
 {
-  "model": "billing_app.bill",
-  "pk": 4,
-  "fields": {
-    "admin_user": 1,
-    "customer_name": "",
-    "customer_phone": "",
-    "total_amount": "1500.00",
-    "discount": "0.00",
-    "gst_amount": "0.00",
-    "final_amount": "1500.00",
-    "created_at": "2026-04-09T07:25:17.529Z"
-  }
+    "model": "billing_app.bill",
+    "pk": 4,
+    "fields": {
+        "admin_user": 1,
+        "customer_name": "",
+        "customer_phone": "",
+        "total_amount": "1500.00",
+        "discount": "0.00",
+        "gst_amount": "0.00",
+        "final_amount": "1500.00",
+        "created_at": "2026-04-09T07:25:17.529Z"
+    }
 },
 {
-  "model": "billing_app.bill",
-  "pk": 5,
-  "fields": {
-    "admin_user": 1,
-    "customer_name": "abisheak",
-    "customer_phone": "9524784769",
-    "total_amount": "3000.00",
-    "discount": "0.00",
-    "gst_amount": "0.00",
-    "final_amount": "3000.00",
-    "created_at": "2026-04-09T15:34:23.121Z"
-  }
+    "model": "billing_app.bill",
+    "pk": 5,
+    "fields": {
+        "admin_user": 1,
+        "customer_name": "abisheak",
+        "customer_phone": "9524784769",
+        "total_amount": "3000.00",
+        "discount": "0.00",
+        "gst_amount": "0.00",
+        "final_amount": "3000.00",
+        "created_at": "2026-04-09T15:34:23.121Z"
+    }
 },
 {
-  "model": "billing_app.bill",
-  "pk": 6,
-  "fields": {
-    "admin_user": 1,
-    "customer_name": "Mohan",
-    "customer_phone": "9524784769",
-    "total_amount": "2900.00",
-    "discount": "0.00",
-    "gst_amount": "0.00",
-    "final_amount": "2900.00",
-    "created_at": "2026-04-15T05:12:15.285Z"
-  }
+    "model": "billing_app.bill",
+    "pk": 6,
+    "fields": {
+        "admin_user": 1,
+        "customer_name": "Mohan",
+        "customer_phone": "9524784769",
+        "total_amount": "2900.00",
+        "discount": "0.00",
+        "gst_amount": "0.00",
+        "final_amount": "2900.00",
+        "created_at": "2026-04-15T05:12:15.285Z"
+    }
 },
 {
-  "model": "billing_app.bill",
-  "pk": 7,
-  "fields": {
-    "admin_user": 1,
-    "customer_name": "abisheak",
-    "customer_phone": "9524784769",
-    "total_amount": "1400.00",
-    "discount": "0.00",
-    "gst_amount": "0.00",
-    "final_amount": "1400.00",
-    "created_at": "2026-04-15T05:13:41.140Z"
-  }
+    "model": "billing_app.bill",
+    "pk": 7,
+    "fields": {
+        "admin_user": 1,
+        "customer_name": "abisheak",
+        "customer_phone": "9524784769",
+        "total_amount": "1400.00",
+        "discount": "0.00",
+        "gst_amount": "0.00",
+        "final_amount": "1400.00",
+        "created_at": "2026-04-15T05:13:41.140Z"
+    }
 },
 {
-  "model": "billing_app.bill",
-  "pk": 8,
-  "fields": {
-    "admin_user": 1,
-    "customer_name": "",
-    "customer_phone": "",
-    "total_amount": "2550.00",
-    "discount": "0.00",
-    "gst_amount": "0.00",
-    "final_amount": "2550.00",
-    "created_at": "2026-04-16T09:24:35.148Z"
-  }
+    "model": "billing_app.bill",
+    "pk": 8,
+    "fields": {
+        "admin_user": 1,
+        "customer_name": "",
+        "customer_phone": "",
+        "total_amount": "2550.00",
+        "discount": "0.00",
+        "gst_amount": "0.00",
+        "final_amount": "2550.00",
+        "created_at": "2026-04-16T09:24:35.148Z"
+    }
 },
 {
-  "model": "billing_app.bill",
-  "pk": 9,
-  "fields": {
-    "admin_user": 1,
-    "customer_name": "",
-    "customer_phone": "",
-    "total_amount": "2850.00",
-    "discount": "0.00",
-    "gst_amount": "0.00",
-    "final_amount": "2850.00",
-    "created_at": "2026-04-16T09:31:27.416Z"
-  }
+    "model": "billing_app.bill",
+    "pk": 9,
+    "fields": {
+        "admin_user": 1,
+        "customer_name": "",
+        "customer_phone": "",
+        "total_amount": "2850.00",
+        "discount": "0.00",
+        "gst_amount": "0.00",
+        "final_amount": "2850.00",
+        "created_at": "2026-04-16T09:31:27.416Z"
+    }
 },
 {
-  "model": "billing_app.bill",
-  "pk": 10,
-  "fields": {
-    "admin_user": 1,
-    "customer_name": "",
-    "customer_phone": "",
-    "total_amount": "6100.00",
-    "discount": "0.00",
-    "gst_amount": "0.00",
-    "final_amount": "6100.00",
-    "created_at": "2026-04-16T10:05:39.643Z"
-  }
+    "model": "billing_app.bill",
+    "pk": 10,
+    "fields": {
+        "admin_user": 1,
+        "customer_name": "",
+        "customer_phone": "",
+        "total_amount": "6100.00",
+        "discount": "0.00",
+        "gst_amount": "0.00",
+        "final_amount": "6100.00",
+        "created_at": "2026-04-16T10:05:39.643Z"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 1,
-  "fields": {
-    "bill": 1,
-    "product": 1,
-    "quantity": 1,
-    "price": "1500.00",
-    "total": "1500.00"
-  }
+    "model": "billing_app.bill",
+    "pk": 11,
+    "fields": {
+        "admin_user": 1,
+        "customer_name": "",
+        "customer_phone": "",
+        "total_amount": "2550.00",
+        "discount": "0.00",
+        "gst_amount": "0.00",
+        "final_amount": "2550.00",
+        "created_at": "2026-04-22T04:53:19.133Z"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 2,
-  "fields": {
-    "bill": 1,
-    "product": 2,
-    "quantity": 2,
-    "price": "1500.00",
-    "total": "3000.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 1,
+    "fields": {
+        "bill": 1,
+        "product": 1,
+        "quantity": 1,
+        "price": "1500.00",
+        "total": "1500.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 3,
-  "fields": {
-    "bill": 2,
-    "product": 1,
-    "quantity": 1,
-    "price": "1500.00",
-    "total": "1500.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 2,
+    "fields": {
+        "bill": 1,
+        "product": 2,
+        "quantity": 2,
+        "price": "1500.00",
+        "total": "3000.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 4,
-  "fields": {
-    "bill": 3,
-    "product": 1,
-    "quantity": 1,
-    "price": "1500.00",
-    "total": "1500.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 3,
+    "fields": {
+        "bill": 2,
+        "product": 1,
+        "quantity": 1,
+        "price": "1500.00",
+        "total": "1500.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 5,
-  "fields": {
-    "bill": 3,
-    "product": 2,
-    "quantity": 1,
-    "price": "1500.00",
-    "total": "1500.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 4,
+    "fields": {
+        "bill": 3,
+        "product": 1,
+        "quantity": 1,
+        "price": "1500.00",
+        "total": "1500.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 6,
-  "fields": {
-    "bill": 4,
-    "product": 1,
-    "quantity": 1,
-    "price": "1500.00",
-    "total": "1500.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 5,
+    "fields": {
+        "bill": 3,
+        "product": 2,
+        "quantity": 1,
+        "price": "1500.00",
+        "total": "1500.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 7,
-  "fields": {
-    "bill": 5,
-    "product": 1,
-    "quantity": 1,
-    "price": "1500.00",
-    "total": "1500.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 6,
+    "fields": {
+        "bill": 4,
+        "product": 1,
+        "quantity": 1,
+        "price": "1500.00",
+        "total": "1500.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 8,
-  "fields": {
-    "bill": 5,
-    "product": 2,
-    "quantity": 1,
-    "price": "1500.00",
-    "total": "1500.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 7,
+    "fields": {
+        "bill": 5,
+        "product": 1,
+        "quantity": 1,
+        "price": "1500.00",
+        "total": "1500.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 9,
-  "fields": {
-    "bill": 6,
-    "product": 1,
-    "quantity": 1,
-    "price": "1500.00",
-    "total": "1500.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 8,
+    "fields": {
+        "bill": 5,
+        "product": 2,
+        "quantity": 1,
+        "price": "1500.00",
+        "total": "1500.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 10,
-  "fields": {
-    "bill": 6,
-    "product": 2,
-    "quantity": 1,
-    "price": "1400.00",
-    "total": "1400.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 9,
+    "fields": {
+        "bill": 6,
+        "product": 1,
+        "quantity": 1,
+        "price": "1500.00",
+        "total": "1500.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 11,
-  "fields": {
-    "bill": 7,
-    "product": 2,
-    "quantity": 1,
-    "price": "1400.00",
-    "total": "1400.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 10,
+    "fields": {
+        "bill": 6,
+        "product": 2,
+        "quantity": 1,
+        "price": "1400.00",
+        "total": "1400.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 12,
-  "fields": {
-    "bill": 8,
-    "product": 2,
-    "quantity": 1,
-    "price": "1400.00",
-    "total": "1400.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 11,
+    "fields": {
+        "bill": 7,
+        "product": 2,
+        "quantity": 1,
+        "price": "1400.00",
+        "total": "1400.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 13,
-  "fields": {
-    "bill": 8,
-    "product": 6,
-    "quantity": 1,
-    "price": "1150.00",
-    "total": "1150.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 12,
+    "fields": {
+        "bill": 8,
+        "product": 2,
+        "quantity": 1,
+        "price": "1400.00",
+        "total": "1400.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 14,
-  "fields": {
-    "bill": 9,
-    "product": 4,
-    "quantity": 1,
-    "price": "1700.00",
-    "total": "1700.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 13,
+    "fields": {
+        "bill": 8,
+        "product": 6,
+        "quantity": 1,
+        "price": "1150.00",
+        "total": "1150.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 15,
-  "fields": {
-    "bill": 9,
-    "product": 6,
-    "quantity": 1,
-    "price": "1150.00",
-    "total": "1150.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 14,
+    "fields": {
+        "bill": 9,
+        "product": 4,
+        "quantity": 1,
+        "price": "1700.00",
+        "total": "1700.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 16,
-  "fields": {
-    "bill": 10,
-    "product": 1,
-    "quantity": 2,
-    "price": "1500.00",
-    "total": "3000.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 15,
+    "fields": {
+        "bill": 9,
+        "product": 6,
+        "quantity": 1,
+        "price": "1150.00",
+        "total": "1150.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 17,
-  "fields": {
-    "bill": 10,
-    "product": 2,
-    "quantity": 1,
-    "price": "1400.00",
-    "total": "1400.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 16,
+    "fields": {
+        "bill": 10,
+        "product": 1,
+        "quantity": 2,
+        "price": "1500.00",
+        "total": "3000.00"
+    }
 },
 {
-  "model": "billing_app.billitem",
-  "pk": 18,
-  "fields": {
-    "bill": 10,
-    "product": 4,
-    "quantity": 1,
-    "price": "1700.00",
-    "total": "1700.00"
-  }
+    "model": "billing_app.billitem",
+    "pk": 17,
+    "fields": {
+        "bill": 10,
+        "product": 2,
+        "quantity": 1,
+        "price": "1400.00",
+        "total": "1400.00"
+    }
+},
+{
+    "model": "billing_app.billitem",
+    "pk": 18,
+    "fields": {
+        "bill": 10,
+        "product": 4,
+        "quantity": 1,
+        "price": "1700.00",
+        "total": "1700.00"
+    }
+},
+{
+    "model": "billing_app.billitem",
+    "pk": 19,
+    "fields": {
+        "bill": 11,
+        "product": 2,
+        "quantity": 1,
+        "price": "1400.00",
+        "total": "1400.00"
+    }
+},
+{
+    "model": "billing_app.billitem",
+    "pk": 20,
+    "fields": {
+        "bill": 11,
+        "product": 6,
+        "quantity": 1,
+        "price": "1150.00",
+        "total": "1150.00"
+    }
 }
 ]
