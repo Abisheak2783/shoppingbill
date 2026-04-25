@@ -522,6 +522,13 @@ body {
     z-index: 1001;
 }
 
+.mobile-only {
+    display: none;
+}
+.desktop-only {
+    display: block;
+}
+
 /* Mobile Backdrop */
 .sidebar-overlay {
     display: none;
@@ -567,6 +574,14 @@ body {
     .d-none-mobile {
         display: none !important;
     }
+    
+    .mobile-only {
+        display: block !important;
+    }
+    
+    .desktop-only {
+        display: none !important;
+    }
 }
 
 @media (max-width: 768px) {
@@ -598,7 +613,46 @@ body {
     /* Responsive Table Helper */
     .premium-table th.hide-mobile,
     .premium-table td.hide-mobile {
-        display: none;
+        display: none !important;
+    }
+
+    /* Mobile Inventory Cards */
+    .mobile-inventory-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .inventory-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--glass-outline);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .inventory-card-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .inventory-card-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 12px 0;
+        border-top: 1px solid var(--glass-outline);
+        border-bottom: 1px solid var(--glass-outline);
+    }
+
+    .inventory-card-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
     }
 }
 

@@ -54,7 +54,8 @@
         </div>
     </div>
 
-    <div class="premium-table-container">
+    <!-- Desktop View: Table -->
+    <div class="premium-table-container desktop-only">
         <table class="premium-table" id="inventoryTable">
             <thead>
                 <tr>
@@ -142,6 +143,66 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Mobile View: Cards -->
+    <div class="mobile-inventory-cards mobile-only">
+        {% for product in products %}
+        <div class="inventory-card product-card-item" 
+             data-name="{{ product.name|lower }}" 
+             data-category="{{ product.category.name|lower }}"
+             data-stock="{{ product.stock_quantity }}" 
+             data-threshold="{{ product.low_stock_threshold }}">
+            <div class="inventory-card-header">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" style="width: 60px; height: 60px; border-radius: 12px; object-fit: cover;">
+                {% else %}
+                <div style="width: 60px; height: 60px; border-radius: 12px; background: var(--bg-main); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 24px;">
+                    <i class='bx bx-cube'></i>
+                </div>
+                {% endif %}
+                <div style="flex: 1;">
+                    <div style="font-weight: 700; color: var(--text-main); font-size: 16px;">{{ product.name }}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                        <span class="badge badge-primary" style="font-size: 10px;">{{ product.category.name }}</span>
+                        <span style="font-weight: 800; color: var(--primary-dark);">₹{{ product.price|stringformat:".2f" }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="inventory-card-details">
+                <div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Stock Level</div>
+                    <div style="font-weight: 700; font-size: 14px;">{{ product.stock_quantity }} units</div>
+                </div>
+                <div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Status</div>
+                    <div>
+                        {% if product.stock_quantity <= 0 %}
+                            <span class="badge badge-danger">Out of Stock</span>
+                        {% elif product.stock_quantity <= product.low_stock_threshold %}
+                            <span class="badge badge-warning">Low Stock</span>
+                        {% else %}
+                            <span class="badge badge-success">Available</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="inventory-card-actions">
+                <a href="{% url 'product_edit' product.pk %}" class="btn" style="background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 8px 16px; border-radius: 10px; font-size: 13px;">
+                    <i class='bx bx-edit-alt'></i> Edit
+                </a>
+                <a href="{% url 'product_delete' product.pk %}" class="btn" style="background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 8px 16px; border-radius: 10px; font-size: 13px;">
+                    <i class='bx bx-trash'></i> Delete
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="glass-panel" style="padding: 40px; text-align: center;">
+            <p style="color: var(--text-muted);">No products found.</p>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 
 <style>
@@ -180,17 +241,17 @@
 
     const searchInput = document.getElementById('inventorySearch');
     const stockFilter = document.getElementById('stockFilter');
-    const rows = document.querySelectorAll('.product-row');
+    const rows = document.querySelectorAll('.product-row, .product-card-item');
 
     function filterTable() {
         const query = searchInput.value.toLowerCase();
         const filter = stockFilter.value;
 
         rows.forEach(row => {
-            const name = row.getAttribute('data-name');
-            const category = row.getAttribute('data-category');
-            const stock = parseInt(row.getAttribute('data-stock'));
-            const threshold = parseInt(row.getAttribute('data-threshold'));
+            const name = row.getAttribute('data-name') || '';
+            const category = row.getAttribute('data-category') || '';
+            const stock = parseInt(row.getAttribute('data-stock') || '0');
+            const threshold = parseInt(row.getAttribute('data-threshold') || '0');
             
             let matchesSearch = name.includes(query) || category.includes(query);
             let matchesFilter = true;
