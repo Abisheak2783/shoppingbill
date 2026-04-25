@@ -24,7 +24,7 @@ def get_bill_items_summary(bills):
         {
             'name': item['product__name'],
             'price': float(item['price']),
-            'qty': item['total_qty'],
+            'qty': float(item['total_qty']),
             'total': float(item['total_price'])
         } for item in items
     ]
@@ -226,7 +226,7 @@ def billing_view(request):
             
             # Process items
             for p_id, qty_str in zip(product_ids, quantities):
-                qty = int(qty_str)
+                qty = Decimal(qty_str)
                 if qty <= 0: continue
                 
                 product = Product.objects.get(id=p_id)
@@ -278,7 +278,7 @@ def billing_view(request):
             'id': p.id, 
             'name': p.name, 
             'price': float(p.price), 
-            'stock': p.stock_quantity,
+            'stock': float(p.stock_quantity),
             'category_id': p.category.id if p.category else None,
             'category_name': p.category.name if p.category else 'Uncategorized',
             'image_url': p.image.url if p.image else ''
