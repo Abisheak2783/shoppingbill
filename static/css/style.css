@@ -585,6 +585,10 @@ body {
 }
 
 @media (max-width: 768px) {
+    .pos-cart {
+        margin-bottom: 160px; /* Increased space for the taller stacked bar */
+    }
+
     .header {
         flex-direction: row; /* Keep row but wrap if needed */
         justify-content: space-between;
