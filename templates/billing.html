@@ -322,17 +322,17 @@
     </div>
 </form>
 
-            <div class="mobile-cart-bar mobile-only" id="mobileCartBar">
+            <div class="mobile-cart-bar mobile-only" id="mobileCartBar" style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 12px; flex: 1;" onclick="document.getElementById('posCartSection').scrollIntoView({behavior: 'smooth'})">
-                    <div style="background: rgba(255,255,255,0.2); width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                        <i class='bx bx-shopping-bag' style="font-size: 18px;"></i>
+                    <div style="background: rgba(255,255,255,0.2); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <i class='bx bx-shopping-bag' style="font-size: 20px;"></i>
                     </div>
                     <div>
-                        <div id="mobileCartCount" style="font-size: 12px; font-weight: 700;">0 Items</div>
-                        <div id="mobileCartTotal" style="font-size: 14px; font-weight: 800; opacity: 0.9;">₹0.00</div>
+                        <div id="mobileCartCount" style="font-size: 11px; font-weight: 700; opacity: 0.8; text-transform: uppercase;">0 Items</div>
+                        <div id="mobileCartTotal" style="font-size: 16px; font-weight: 800;">₹0.00</div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-success" style="padding: 10px 20px; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.2);">
+                <button type="submit" class="btn btn-success" style="padding: 12px 20px; border-radius: 12px; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); flex-shrink: 0;">
                     Checkout <i class='bx bx-right-arrow-alt'></i>
                 </button>
             </div>
