@@ -501,13 +501,15 @@
     }
 
     function updateCartUI() {
+        if (!billItemsBody) return;
         billItemsBody.innerHTML = '';
         let count = 0;
         
         for (const [id, qty] of Object.entries(cart)) {
             const p = productsMap[id];
-            count++;
+            if (!p) continue; // Safety check
             
+            count++;
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>
@@ -533,10 +535,8 @@
             billItemsBody.appendChild(tr);
         }
         
-        if (count > 0) {
-            emptyCartMsg.style.display = 'none';
-        } else {
-            emptyCartMsg.style.display = 'block';
+        if (emptyCartMsg) {
+            emptyCartMsg.style.display = count > 0 ? 'none' : 'block';
         }
         
         recalculateTotals();
@@ -546,7 +546,9 @@
         let subtotal = 0;
         let totalItems = 0;
         for (const [id, qty] of Object.entries(cart)) {
-            subtotal += productsMap[id].price * qty;
+            const p = productsMap[id];
+            if (!p) continue; // Safety check
+            subtotal += p.price * qty;
             totalItems = parseFloat((totalItems + qty).toFixed(3));
         }
         
