@@ -16,8 +16,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    stock_quantity = models.IntegerField(default=0)
-    low_stock_threshold = models.IntegerField(default=10)
+    stock_quantity = models.DecimalField(max_digits=10, decimal_places=3, default=0.000)
+    low_stock_threshold = models.DecimalField(max_digits=10, decimal_places=3, default=10.000)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -41,7 +41,7 @@ class Bill(models.Model):
 class BillItem(models.Model):
     bill = models.ForeignKey(Bill, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
-    quantity = models.IntegerField(default=1)
+    quantity = models.DecimalField(max_digits=10, decimal_places=3, default=1.000)
     price = models.DecimalField(max_digits=10, decimal_places=2) # Price at the time of sale
     total = models.DecimalField(max_digits=12, decimal_places=2) # quantity * price
     

@@ -422,16 +422,39 @@
 
     function addToCart(productId, cardElement) {
         const product = productsMap[productId];
-        if (product.liveStock <= 0) return; // Out of stock locally
+        if (product.liveStock <= 0) return;
         
-        // Anim effect
-        cardElement.classList.remove('pop-anim');
-        void cardElement.offsetWidth; // trigger reflow
-        cardElement.classList.add('pop-anim');
+        // Anim effect if card provided
+        if (cardElement) {
+            cardElement.classList.remove('pop-anim');
+            void cardElement.offsetWidth;
+            cardElement.classList.add('pop-anim');
+        }
         
         if (!cart[productId]) cart[productId] = 0;
-        cart[productId] += 1;
-        product.liveStock -= 1;
+        cart[productId] = parseFloat((cart[productId] + 1).toFixed(3));
+        product.liveStock = parseFloat((product.stock - cart[productId]).toFixed(3));
+        
+        updateCartUI();
+        updateGridUI(productId);
+    }
+    
+    function updateManualQuantity(productId, newQty) {
+        const product = productsMap[productId];
+        newQty = parseFloat(newQty);
+        
+        if (isNaN(newQty) || newQty <= 0) {
+            removeFromCart(productId, cart[productId]);
+            return;
+        }
+        
+        if (newQty > product.stock) {
+            alert(`Only ${product.stock} units in stock!`);
+            newQty = product.stock;
+        }
+        
+        cart[productId] = parseFloat(newQty.toFixed(3));
+        product.liveStock = parseFloat((product.stock - cart[productId]).toFixed(3));
         
         updateCartUI();
         updateGridUI(productId);
@@ -441,12 +464,14 @@
         const product = productsMap[productId];
         if (!cart[productId]) return;
         
-        const removeCount = Math.min(cart[productId], qtyToRemove);
-        cart[productId] -= removeCount;
-        product.liveStock += removeCount;
+        const removeCount = parseFloat(Math.min(cart[productId], qtyToRemove).toFixed(3));
+        cart[productId] = parseFloat((cart[productId] - removeCount).toFixed(3));
         
         if (cart[productId] <= 0) {
             delete cart[productId];
+            product.liveStock = product.stock;
+        } else {
+            product.liveStock = parseFloat((product.stock - cart[productId]).toFixed(3));
         }
         
         updateCartUI();
@@ -492,10 +517,10 @@
                     <input type="hidden" name="quantity[]" value="${qty}">
                 </td>
                 <td>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <button type="button" onclick="removeFromCart(${p.id})" style="background:var(--bg-main); color:var(--text-main); border:1px solid var(--glass-outline); border-radius:6px; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;">-</button>
-                        <span style="font-weight: 600; min-width: 20px; text-align: center;">${qty}</span>
-                        <button type="button" onclick="addToCart(${p.id}, document.getElementById('card-${p.id}'))" style="background:var(--bg-main); color:var(--text-main); border:1px solid var(--glass-outline); border-radius:6px; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" ${p.liveStock <= 0 ? 'disabled' : ''}>+</button>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <button type="button" onclick="removeFromCart(${p.id}, 1)" style="background:var(--bg-main); color:var(--text-main); border:1px solid var(--glass-outline); border-radius:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer;">-</button>
+                        <input type="number" step="0.001" value="${qty}" onchange="updateManualQuantity(${p.id}, this.value)" style="width: 60px; text-align: center; border: 1px solid var(--glass-outline); border-radius: 8px; padding: 4px; font-weight: 600; background: var(--bg-main); color: var(--text-main);">
+                        <button type="button" onclick="addToCart(${p.id})" style="background:var(--bg-main); color:var(--text-main); border:1px solid var(--glass-outline); border-radius:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer;">+</button>
                     </div>
                 </td>
                 <td style="text-align: right; color: var(--primary-dark); font-weight: 700;">
@@ -522,7 +547,7 @@
         let totalItems = 0;
         for (const [id, qty] of Object.entries(cart)) {
             subtotal += productsMap[id].price * qty;
-            totalItems += qty;
+            totalItems = parseFloat((totalItems + qty).toFixed(3));
         }
         
         subtotalDisplay.innerText = '₹' + subtotal.toLocaleString('en-IN', {minimumFractionDigits: 2});
