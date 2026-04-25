@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop_system.settings')
+def create_superuser():
     django.setup()
     
     User = get_user_model()

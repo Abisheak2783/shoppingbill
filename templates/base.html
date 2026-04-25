@@ -39,10 +39,10 @@
                 </a>
             </li>
             <li style="margin-top: auto;">
-                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                <form action="{% url 'logout' %}" method="post" style="width: 100%;">
                     {% csrf_token %}
-                    <button type="submit" style="background:none;border:none;width:100%;text-align:left;cursor:pointer;">
-                        <a style="display:flex;width:100%;"><i class='bx bx-log-out'></i> Logout</a>
+                    <button type="submit" class="nav-link-btn" style="width: 100%; background: none; border: none; padding: 0; text-align: left; cursor: pointer;">
+                        <span class="nav-link-item"><i class='bx bx-log-out'></i> Logout</span>
                     </button>
                 </form>
             </li>

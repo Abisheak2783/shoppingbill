@@ -3,7 +3,7 @@ services:
     name: shoppingbill
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn shop_system.wsgi"
+    startCommand: "python scripts/init_prod.py && gunicorn shop_system.wsgi"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9

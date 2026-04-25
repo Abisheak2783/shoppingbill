@@ -170,8 +170,12 @@
     border-radius: 12px;
 }
 #billTable td, #billTable th {
-    padding: 12px;
+    padding: 12px 8px; /* Reduced padding for mobile */
     border: none;
+}
+@media (max-width: 480px) {
+    #billTable th { font-size: 11px; padding: 8px 4px; }
+    #billTable td { padding: 8px 4px; font-size: 13px; }
 }
 #billTable td:first-child { border-radius: 12px 0 0 12px; }
 #billTable td:last-child { border-radius: 0 12px 12px 0; }
@@ -482,7 +486,7 @@
             tr.innerHTML = `
                 <td>
                     <div style="font-weight: 600; color: var(--text-main);">${p.name}</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">₹${p.price.toLocaleString('en-IN', {minimumFractionDigits: 2})} /ea</div>
+                    <div class="hide-mobile" style="font-size: 11px; color: var(--text-muted);">₹${p.price.toLocaleString('en-IN', {minimumFractionDigits: 2})} /ea</div>
                     <input type="hidden" name="product_id[]" value="${p.id}">
                     <input type="hidden" name="quantity[]" value="${qty}">
                 </td>

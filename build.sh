@@ -16,3 +16,6 @@ ls -R static
 # run build commands
 # Use --clear to ensure no stale files interfere
 python manage.py collectstatic --no-input --clear
+
+# Apply database migrations
+python manage.py migrate
