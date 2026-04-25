@@ -1,156 +1,262 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block page_title %}Dashboard Overview{% endblock %}
 
-{% block content %}
-<div class="glass-panel" style="padding: 24px; margin-bottom: 32px; background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; border: none; overflow: hidden; position: relative; min-height: 180px;">
-    <div style="position: relative; z-index: 1;">
-        <h2 style="font-size: clamp(20px, 5vw, 28px); font-weight: 800; margin-bottom: 8px;">Welcome back, {{ user.username }}! 👋</h2>
-        <p style="opacity: 0.9; font-size: 15px; max-width: 600px;">Your shop is performing well today. You have generated {{ bills_today_count }} bills so far. Keep it up!</p>
-        <div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px;">
-            <a href="{% url 'billing' %}" class="btn" style="background: white; color: var(--primary-dark); font-weight: 700; flex: 1; min-width: 140px; justify-content: center;"><i class='bx bx-plus-circle'></i> New Sale</a>
-            <a href="{% url 'reports' %}" class="btn" style="background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(10px); flex: 1; min-width: 140px; justify-content: center;"><i class='bx bx-bar-chart-alt-2'></i> View Reports</a>
-        </div>
-    </div>
-    <i class='bx bxs-rocket' style="position: absolute; right: -40px; bottom: -40px; font-size: clamp(120px, 30vw, 200px); opacity: 0.1; transform: rotate(-15deg);"></i>
-</div>
-
-{% if last_bill %}
-<div class="glass-panel" style="padding: 16px 24px; margin-bottom: 32px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; border-left: 4px solid var(--success); background: white;">
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(16, 185, 129, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 20px;">
-            <i class='bx bx-check-circle'></i>
-        </div>
-        <div>
-            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Last Transaction</div>
-            <div style="font-size: 15px; color: var(--text-main); font-weight: 500;">Bill #{{ last_bill.id }} for {{ last_bill.customer_name|default:"Cash Customer" }} - <span style="font-weight: 800; color: var(--success);">₹{{ last_bill.final_amount|stringformat:".2f" }}</span></div>
-        </div>
-    </div>
-    <a href="{% url 'invoice' last_bill.id %}" target="_blank" class="btn btn-primary" style="padding: 10px 20px; font-size: 13px; border-radius: 10px; width: auto;">
-        <i class='bx bx-printer'></i> Print Invoice
-    </a>
-</div>
-{% endif %}
-
-<div class="dashboard-grid">
-    <div class="glass-panel stat-card success">
-        <div class="stat-title">Sales Today</div>
-        <div class="stat-value">₹{{ total_sales_today|default:"0.00"|stringformat:".2f" }}</div>
-        <div class="stat-icon" style="color: var(--success); opacity: 0.15;"><i class='bx bx-trending-up'></i></div>
-    </div>
-    <div class="glass-panel stat-card primary">
-        <div class="stat-title">Bills Today</div>
-        <div class="stat-value">{{ bills_today_count }}</div>
-        <div class="stat-icon" style="color: var(--primary); opacity: 0.15;"><i class='bx bx-receipt'></i></div>
-    </div>
-    <div class="glass-panel stat-card warning">
-        <div class="stat-title">Total Revenue</div>
-        <div class="stat-value">₹{{ total_revenue|stringformat:".2f" }}</div>
-        <div class="stat-icon" style="color: var(--warning); opacity: 0.15;"><i class='bx bx-dollar-circle'></i></div>
-    </div>
-</div>
-
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    .dashboard-secondary-grid {
-        display: grid;
-        grid-template-columns: 1.5fr 1fr;
-        gap: 32px;
-        margin-top: 32px;
+    .dashboard-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border-radius: 24px;
+        padding: 32px;
+        color: white;
+        margin-bottom: 32px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.2);
     }
-    @media (max-width: 1024px) {
-        .dashboard-secondary-grid {
-            grid-template-columns: 1fr;
-        }
+    .header-bg-icon {
+        position: absolute;
+        right: -20px;
+        bottom: -20px;
+        font-size: 180px;
+        opacity: 0.1;
+        transform: rotate(-15deg);
+    }
+    .stat-card-new {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s ease;
+        border: 1px solid var(--glass-outline);
+        box-shadow: var(--shadow-sm);
+    }
+    .stat-card-new:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    .stat-icon-box {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+    .chart-container {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        border: 1px solid var(--glass-outline);
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+    }
+    .recent-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        border-radius: 16px;
+        transition: background 0.2s;
+    }
+    .recent-item:hover {
+        background: var(--bg-main);
     }
 </style>
-<div class="dashboard-secondary-grid">
-    <!-- Statistics Section -->
-    <div class="glass-panel" style="padding: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h3 style="color: var(--text-main); font-weight: 800; margin: 0; display: flex; align-items: center; gap: 8px;">
-                <i class='bx bx-pie-chart-alt-2' style="color: var(--success);"></i> Today's Performance
-            </h3>
-            <a href="{% url 'reports' %}" style="font-size: 13px; color: var(--primary); font-weight: 700; text-decoration: none;">Full Reports →</a>
+{% endblock %}
+
+{% block content %}
+<!-- Welcome Header -->
+<div class="dashboard-header">
+    <div style="position: relative; z-index: 2;">
+        <h2 style="font-weight: 800; font-size: 28px; margin-bottom: 8px;">Hello, {{ user.username }}! 🚀</h2>
+        <p style="opacity: 0.9; font-size: 16px; max-width: 500px;">Your shop generated <b>₹{{ total_sales_today|default:"0.00"|stringformat:".2f" }}</b> in revenue today. Here's a quick look at your performance.</p>
+        <div style="margin-top: 24px; display: flex; gap: 12px;">
+            <a href="{% url 'billing' %}" class="btn" style="background: white; color: #4f46e5; font-weight: 700; padding: 12px 24px; border-radius: 14px;">
+                <i class='bx bx-plus-circle'></i> New Sale
+            </a>
+            <a href="{% url 'product_list' %}" class="btn" style="background: rgba(255,255,255,0.2); color: white; padding: 12px 24px; border-radius: 14px; backdrop-filter: blur(10px);">
+                <i class='bx bx-package'></i> Stock Info
+            </a>
         </div>
+    </div>
+    <i class='bx bxs-zap header-bg-icon'></i>
+</div>
+
+<!-- Key Stats Row -->
+<div class="dashboard-grid" style="margin-bottom: 32px;">
+    <div class="stat-card-new">
+        <div class="stat-icon-box" style="background: #ecfdf5; color: #10b981;">
+            <i class='bx bx-trending-up'></i>
+        </div>
+        <div>
+            <div style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Daily Revenue</div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--text-main);">₹{{ total_sales_today|default:"0.00"|stringformat:".2f" }}</div>
+        </div>
+    </div>
+    <div class="stat-card-new">
+        <div class="stat-icon-box" style="background: #eff6ff; color: #3b82f6;">
+            <i class='bx bx-receipt'></i>
+        </div>
+        <div>
+            <div style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Total Bills</div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--text-main);">{{ bills_today_count }}</div>
+        </div>
+    </div>
+    <div class="stat-card-new">
+        <div class="stat-icon-box" style="background: #fff7ed; color: #f59e0b;">
+            <i class='bx bx-wallet'></i>
+        </div>
+        <div>
+            <div style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Total Revenue</div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--text-main);">₹{{ total_revenue|stringformat:".2f" }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts & Main Info -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; margin-bottom: 32px;">
+    <!-- Sales Chart -->
+    <div class="chart-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h3 style="font-weight: 800; color: var(--text-main); margin: 0;">Sales Trend (Today)</h3>
+            <span class="badge badge-primary">Hourly Update</span>
+        </div>
+        <div style="height: 300px;">
+            <canvas id="salesTrendChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Top Products Pie -->
+    <div class="chart-container">
+        <h3 style="font-weight: 800; color: var(--text-main); margin-bottom: 24px;">Product Mix</h3>
+        <div style="height: 300px; display: flex; align-items: center; justify-content: center;">
+            <canvas id="productMixChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 32px;">
+    <!-- Stock & Activity -->
+    <div style="display: flex; flex-direction: column; gap: 32px;">
+        <!-- Low Stock -->
+        <div class="chart-container" style="border-left: 6px solid #ef4444;">
+            <h3 style="font-weight: 800; color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                <i class='bx bx-alarm-exclamation' style="color: #ef4444;"></i> Urgent: Low Stock
+            </h3>
+            {% if low_stock_products %}
+                {% for item in low_stock_products|slice:":5" %}
+                <div class="recent-item" style="padding: 12px;">
+                    <div>
+                        <div style="font-weight: 700;">{{ item.name }}</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Current: {{ item.stock_quantity }}</div>
+                    </div>
+                    <span class="badge badge-danger">Restock</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: var(--text-muted); text-align: center;">Stock is looking good! ✅</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Best Sellers Table -->
+    <div class="chart-container">
+        <h3 style="font-weight: 800; color: var(--text-main); margin-bottom: 24px;">Today's Best Sellers</h3>
         {% if today_items_summary %}
             <div class="premium-table-container">
                 <table class="premium-table">
                     <thead>
                         <tr>
-                            <th>Product</th>
-                            <th style="text-align: center;">Qty</th>
-                            <th style="text-align: right;">Total Amount</th>
+                            <th>Item Name</th>
+                            <th style="text-align: center;">Qty Sold</th>
+                            <th style="text-align: right;">Total Sales</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for item in today_items_summary %}
+                        {% for item in today_items_summary|slice:":8" %}
                         <tr>
-                            <td style="font-weight: 700; color: var(--text-main);">{{ item.name }}</td>
+                            <td style="font-weight: 700;">{{ item.name }}</td>
                             <td style="text-align: center;"><span class="badge badge-primary">{{ item.qty }}</span></td>
-                            <td style="text-align: right; font-weight: 800; color: var(--success);">₹{{ item.total|stringformat:".2f" }}</td>
+                            <td style="text-align: right; font-weight: 800; color: #10b981;">₹{{ item.total|stringformat:".2f" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         {% else %}
-            <div style="text-align: center; padding: 60px 0; color: var(--text-muted);">
-                <i class='bx bx-leaf' style="font-size: 64px; opacity: 0.1; margin-bottom: 16px; display: block;"></i>
-                No sales data yet for today.
-            </div>
+            <p style="color: var(--text-muted); text-align: center; padding: 40px;">No sales recorded today yet.</p>
         {% endif %}
     </div>
-
-    <div style="display: flex; flex-direction: column; gap: 32px;">
-        <!-- Low Stock Alerts -->
-        <div class="glass-panel" style="padding: 24px; border-bottom: 4px solid var(--warning);">
-            <h3 style="margin-bottom: 20px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-                <i class='bx bx-error-circle' style="color: var(--warning);"></i> Low Stock
-            </h3>
-            {% if low_stock_products %}
-                <ul style="list-style: none;">
-                    {% for item in low_stock_products %}
-                    <li style="padding: 12px; border-bottom: 1px solid var(--glass-outline); display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 600;">{{ item.name }}</span>
-                        <span class="badge badge-danger">Only {{ item.stock_quantity }} left</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <div style="text-align: center; padding: 20px 0;">
-                    <i class='bx bx-check-double' style="font-size: 40px; color: var(--success); opacity: 0.2;"></i>
-                    <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px;">All products well stocked.</p>
-                </div>
-            {% endif %}
-        </div>
-
-        <!-- Recent Sales Activity -->
-        <div class="glass-panel" style="padding: 24px;">
-            <h3 style="margin-bottom: 24px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-                <i class='bx bx-history' style="color: var(--primary);"></i> Recent History
-            </h3>
-            {% if recent_activity %}
-                <div class="premium-table-container">
-                    <table class="premium-table">
-                        <tbody>
-                            {% for item in recent_activity %}
-                            <tr>
-                                <td style="padding: 10px 0;">
-                                    <div style="font-weight: 700; font-size: 13px;">{{ item.product.name }}</div>
-                                    <div style="font-size: 11px; color: var(--text-muted);">{{ item.bill.created_at|timesince }} ago</div>
-                                </td>
-                                <td style="text-align: right; padding: 10px 0;">
-                                    <span class="badge" style="background: var(--bg-main);">{{ item.quantity }} units</span>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <p style="color: var(--text-muted); text-align: center; padding: 20px 0;">No recent activity.</p>
-            {% endif %}
-        </div>
-    </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // 1. Sales Trend Chart
+    const trendData = JSON.parse('{{ today_trend_json|escapejs }}');
+    const trendCtx = document.getElementById('salesTrendChart').getContext('2d');
+    
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: trendData.map(d => d.label),
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: trendData.map(d => d.value),
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointBackgroundColor: '#4f46e5',
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 2. Product Mix Chart
+    {% if today_items_summary %}
+    const productData = [
+        {% for item in today_items_summary|slice:":5" %}
+        { name: '{{ item.name }}', value: {{ item.total }} },
+        {% endfor %}
+    ];
+    
+    const mixCtx = document.getElementById('productMixChart').getContext('2d');
+    new Chart(mixCtx, {
+        type: 'doughnut',
+        data: {
+            labels: productData.map(d => d.name),
+            datasets: [{
+                data: productData.map(d => d.value),
+                backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'],
+                borderWidth: 0,
+                cutout: '70%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+            }
+        }
+    });
+    {% endif %}
+</script>
 {% endblock %}

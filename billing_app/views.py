@@ -89,6 +89,7 @@ def dashboard(request):
         'recent_activity': recent_activity,
         'today_items_summary': today_items_summary,
         'last_bill': last_bill,
+        'today_trend_json': json.dumps(get_revenue_trend(bills_today, 'today')),
     }
     return render(request, 'dashboard.html', context)
 
