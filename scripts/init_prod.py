@@ -42,5 +42,31 @@ def init_production():
     user.save()
     print(f"User {username} is ready.")
 
+    # 4. Reset Sequences (Postgres only)
+    from django.db import connection
+    if connection.vendor == 'postgresql':
+        print("Resetting database sequences (Postgres)...")
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT table_name 
+                FROM information_schema.tables 
+                WHERE table_schema = 'public'
+            """)
+            tables = [row[0] for row in cursor.fetchall()]
+            for table in tables:
+                cursor.execute(f"""
+                    SELECT a.attname
+                    FROM   pg_index i
+                    JOIN   pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+                    WHERE  i.indrelid = '{table}'::regclass AND i.indisprimary;
+                """)
+                pk_result = cursor.fetchone()
+                if pk_result:
+                    pk_col = pk_result[0]
+                    try:
+                        cursor.execute(f"SELECT setval(pg_get_serial_sequence('{table}', '{pk_col}'), coalesce(max({pk_col}), 1)) FROM {table};")
+                    except: pass
+        print("Sequences synchronized.")
+
 if __name__ == '__main__':
     init_production()
